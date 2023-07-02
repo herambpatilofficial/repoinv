@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Create Purchase</h2>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="product">Product:</label>
+        <select class="form-control" id="product" name="product">
+          {% for product in products %}
+            <option value="{{ product.id }}">{{ product.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="vendor">Vendor:</label>
+        <select class="form-control" id="vendor" name="vendor">
+          {% for vendor in vendors %}
+            <option value="{{ vendor.id }}">{{ vendor.full_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="qty">Quantity:</label>
+        <input type="number" class="form-control" id="qty" name="qty" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="price">Price:</label>
+        <input type="number" class="form-control" id="price" name="price" step="0.01">
+      </div>
+      <button type="submit" class="btn btn-primary">Create</button>
+      <a href="{% url 'main:purchase_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

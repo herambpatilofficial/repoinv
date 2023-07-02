@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-semibold mb-4">Create New Customer</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="customerName" class="block text-gray-700 text-sm font-medium mb-1">Name</label>
+        <input type="text" class="form-input w-full" id="customerName" name="customer_name" required>
+      </div>
+      <div>
+        <label for="customerMobile" class="block text-gray-700 text-sm font-medium mb-1">Mobile</label>
+        <input type="text" class="form-input w-full" id="customerMobile" name="customer_mobile" required>
+      </div>
+    </div>
+    <div class="mt-4">
+      <label for="customerAddress" class="block text-gray-700 text-sm font-medium mb-1">Email Address</label>
+      <textarea class="form-textarea w-full" id="customerAddress" name="customer_address" rows="3" required></textarea>
+    </div>
+    <div class="flex justify-end mt-6">
+      <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">Create</button>
+      <a href="{% url 'main:customer_list' %}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded ml-2">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

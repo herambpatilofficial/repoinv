@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mx-auto mt-4">
+    <h2 class="text-2xl font-bold mb-4">Inventory Detail</h2>
+    <table class="table-auto border-collapse w-full">
+      <tbody>
+        <tr>
+          <th class="py-2 px-4 border">Product:</th>
+          <td class="py-2 px-4 border">{{ inventory.product.title }}</td>
+        </tr>
+        <tr>
+          <th class="py-2 px-4 border">Purchase Quantity:</th>
+          <td class="py-2 px-4 border">{{ inventory.pur_qty }}</td>
+        </tr>
+        <tr>
+          <th class="py-2 px-4 border">Sale Quantity:</th>
+          <td class="py-2 px-4 border">{{ inventory.sale_qty }}</td>
+        </tr>
+        <tr>
+          <th class="py-2 px-4 border">Total Balance Quantity:</th>
+          <td class="py-2 px-4 border">{{ inventory.total_bal_qty }}</td>
+        </tr>
+        <tr>
+          <th class="py-2 px-4 border">Total Balance Amount:</th>
+          <td class="py-2 px-4 border">{{ inventory.total_bal_amt }}</td>
+      </tbody>
+    </table>
+    <a href="{% url 'main:inventory_list' %}" class="inline-block mt-4 py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 rounded">Back to Inventory List</a>
+  </div>
+{% endblock %}

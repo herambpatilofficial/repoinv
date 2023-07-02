@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>User List</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Is Vendor</th>
+        <th>Toggle Vendor Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.is_vendor }}</td>
+          <td>
+            {% if user.is_superuser %}
+              Superuser
+            {% elif user.is_vendor %}
+              <a href="{% url 'your_app_name:main:toggle_vendor_status' user.id %}">Remove Vendor</a>
+            {% else %}
+              <a href="{% url 'your_app_name:main:toggle_vendor_status' user.id %}">Make Vendor</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

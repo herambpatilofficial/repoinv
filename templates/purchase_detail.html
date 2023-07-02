@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <div class="flex justify-center">
+      <div class="w-full max-w-md">
+        <div class="bg-white shadow-md rounded-lg px-8 py-6">
+          <h2 class="text-2xl mb-4">Purchase Details</h2>
+          <h5 class="text-lg font-bold mb-2">{{ purchase.product.title }}</h5>
+          <div class="flex flex-col">
+            <p><strong>Vendor:</strong> {{ purchase.vendor.full_name }}</p>
+            <p><strong>Quantity:</strong> {{ purchase.qty }}</p>
+            <p><strong>Price:</strong> {{ purchase.price }}</p>
+            <p><strong>Total Amount:</strong> {{ purchase.total_amt }}</p>
+            <p><strong>Date:</strong> {{ purchase.pur_date }}</p>
+          </div>
+          <div class="flex justify-between mt-4">
+            <a href="{% url 'main:purchase_list' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Back to List</a>
+            <a href="{% url 'main:purchase_update' purchase.id %}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Edit</a>
+            <a href="{% url 'main:purchase_delete' purchase.id %}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

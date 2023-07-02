@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-semibold mb-4">Update Customer</h2>
+  <form method="post" enctype="multipart/form-data" class="max-w-sm">
+    {% csrf_token %}
+    <div class="mb-4">
+      <label for="customerName" class="text-gray-800 font-semibold">Name</label>
+      <input type="text" class="form-input mt-1" id="customerName" name="customer_name" value="{{ customer.customer_name }}" required>
+    </div>
+    <div class="mb-4">
+      <label for="customerMobile" class="text-gray-800 font-semibold">Mobile</label>
+      <input type="text" class="form-input mt-1" id="customerMobile" name="customer_mobile" value="{{ customer.customer_mobile }}" required>
+    </div>
+    <div class="mb-4">
+      <label for="customerAddress" class="text-gray-800 font-semibold">Address</label>
+      <textarea class="form-textarea mt-1" id="customerAddress" name="customer_address" rows="3" required>{{ customer.customer_address }}</textarea>
+    </div>
+    <div class="flex justify-between">
+      <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">Update</button>
+      <a href="{% url 'main:customer_list' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

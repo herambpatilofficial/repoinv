@@ -1,0 +1,14 @@
+<!-- update_vendor_status.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Update Vendor Status</h1>
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="is_vendor">Is Vendor:</label>
+      <input type="checkbox" id="is_vendor" name="is_vendor" {% if user.is_vendor %}checked{% endif %}>
+    </div>
+    <button type="submit">Save</button>
+  </form>
+{% endblock %}

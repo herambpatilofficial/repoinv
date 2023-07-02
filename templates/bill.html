@@ -1,0 +1,37 @@
+<!-- bill.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bill</title>
+</head>
+<body>
+    <h1>Bill Details</h1>
+    <h2>Sale ID: {{ sale.id }}</h2>
+    <h3>Customer: {{ sale.customer }}</h3>
+    <h3>Vendor: {{ sale.vendor }}</h3>
+    <h3>Sale Date: {{ sale.sale_date }}</h3>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in line_items %}
+                <tr>
+                    <td>{{ item.product }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.price }}</td>
+                    <td>{{ item.quantity|mul:item.price }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <h3>Total Price: {{ total_price }}</h3>
+</body>
+</html>

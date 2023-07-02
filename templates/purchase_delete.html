@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Delete Purchase</h2>
+    <p>Are you sure you want to delete the following purchase?</p>
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ purchase.product.title }}</h5>
+        <p class="card-text">Vendor: {{ purchase.vendor.full_name }}</p>
+        <p class="card-text">Quantity: {{ purchase.qty }}</p>
+        <p class="card-text">Price: {{ purchase.price }}</p>
+      </div>
+    </div>
+    <form method="POST" action="{% url 'purchase_delete' purchase.id %}" class="mt-3">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+      <a href="{% url 'purchase_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

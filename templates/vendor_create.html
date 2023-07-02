@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Create Vendor</h1>
+  
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+      <label for="full_name">Full Name:</label>
+      <input type="text" id="full_name" name="full_name" required>
+    </div>
+    <div>
+      <label for="photo">Photo:</label>
+      <input type="file" id="photo" name="photo" accept="image/*" required>
+    </div>
+    <div>
+      <label for="address">Address:</label>
+      <textarea id="address" name="address" required></textarea>
+    </div>
+    <div>
+      <label for="mobile">Mobile:</label>
+      <input type="text" id="mobile" name="mobile" required>
+    </div>
+    <div>
+      <label for="status">Status:</label>
+      <input type="checkbox" id="status" name="status">
+    </div>
+    <button type="submit">Create</button>
+  </form>
+  
+{% endblock %}

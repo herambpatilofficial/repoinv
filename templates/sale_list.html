@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Sales List</h1>
+  
+  <!-- Filters -->
+  <div class="mb-4">
+    <form action="{% url 'main:sale_list' %}" method="GET">
+      <div class="flex items-center">
+        <label for="customer-filter" class="mr-2">Customer:</label>
+        <select name="customer" id="customer-filter" class="px-2 py-1 border border-gray-300">
+          <option value="">All</option>
+          {% for customer in customers %}
+            <option value="{{ customer.id }}" {% if customer.id == selected_customer %}selected{% endif %}>{{ customer }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Filter</button>
+      </div>
+    </form>
+  </div>
+  
+  <!-- Sales List -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-300">
+      <thead>
+        <tr>
+          <th class="px-6 py-3 bg-gray-100 border-b text-left">Customer</th>
+          <th class="px-6 py-3 bg-gray-100 border-b text-left">Vendor</th>
+          <th class="px-6 py-3 bg-gray-100 border-b text-left">Date</th>
+          <th class="px-6 py-3 bg-gray-100 border-b text-right">Total Amount</th>
+          <th class="px-6 py-3 bg-gray-100 border-b text-center">Status</th>
+          <th class="px-6 py-3 bg-gray-100 border-b text-center">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sale in sales %}
+          <tr>
+            <td class="px-6 py-4 border-b text-left">{{ sale.customer }}</td>
+            <td class="px-6 py-4 border-b text-left">{{ sale.vendor }}</td>
+            <td class="px-6 py-4 border-b text-left">{{ sale.sale_date }}</td>
+            <td class="px-6 py-4 border-b text-right">{{ sale.total_amount }}</td>
+            <td class="px-6 py-4 border-b text-center">
+              {% if sale.billed %}
+                <span class="px-2 py-1 text-sm text-green-800 bg-green-200 rounded-full">Billed</span>
+              {% else %}
+                <span class="px-2 py-1 text-sm text-red-800 bg-red-200 rounded-full">Not Billed</span>
+              {% endif %}
+            </td>
+            <td class="px-6 py-4 border-b text-center">
+              <a href="{% url 'main:sale_detail' sale.id %}" class="text-blue-500 hover:text-blue-700">View</a>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="6" class="border-t">
+              <table class="w-full border border-gray-300 my-4">
+                <thead>
+                  <tr>
+                    <th class="px-6 py-3 bg-gray-100 border-b">Product</th>
+                    <th class="px-6 py-3 bg-gray-100 border-b">Quantity</th>
+                    <th class="px-6 py-3 bg-gray-100 border-b">Price</th>
+                    <th class="px-6 py-3 bg-gray-100 border-b">Total Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in sale.sale_items.all %}
+                    <tr>
+                      <td class="px-6 py-4 border-b">{{ item.product }}</td>
+                      <td class="px-6 py-4 border-b">{{ item.qty }}</td>
+                      <td class="px-6 py-4 border-b">{{ item.price }}</td>
+                      <td class="px-6 py-4 border-b">{{ item.total_amt }}</td>
+                    </tr>
+                  {% empty %}
+                    <tr>
+                      <td colspan="4" class="px-6 py-4 text-center">No sale items found.</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="6" class="px-6 py-4 text-center">No sales found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Pagination -->
+  <div class="mt-4">
+    {% if sales.has_previous %}
+      <a href="?page=1" class="mr-2 px-2 py-1 bg-gray-200 rounded">First</a>
+      <a href="?page={{ sales.previous_page_number }}" class="mr-2 px-2 py-1 bg-gray-200 rounded">Previous</a>
+    {% endif %}
+    <span class="mr-2 px-2 py-1 bg-gray-200 rounded">Page {{ sales.number }} of {{ sales.paginator.num_pages }}</span>
+    {% if sales.has_next %}
+      <a href="?page={{ sales.next_page_number }}" class="mr-2 px-2 py-1 bg-gray-200 rounded">Next</a>
+      <a href="?page={{ sales.paginator.num_pages }}" class="mr-2 px-2 py-1 bg-gray-200 rounded">Last</a>
+    {% endif %}
+  </div>
+{% endblock %}

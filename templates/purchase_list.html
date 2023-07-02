@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2 class="text-2xl font-bold mb-4">Purchase List</h2>
+    {% comment %} Create purchase button {% endcomment %}
+    <div class="flex justify-end mb-4">
+      <a href="{% url 'main:purchase_create' %}" class="btn btn-primary">Create Purchase</a>
+    </div>
+    <table class="table-auto w-full">
+      <thead>
+        <tr>
+          <th class="px-4 py-2">#</th>
+          <th class="px-4 py-2">Product</th>
+          <th class="px-4 py-2">Vendor</th>
+          <th class="px-4 py-2">Quantity</th>
+          <th class="px-4 py-2">Price</th>
+          <th class="px-4 py-2">Total Amount</th>
+          <th class="px-4 py-2">Date</th>
+          <th class="px-4 py-2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for purchase in purchases %}
+          <tr>
+            <td class="border px-4 py-2">{{ forloop.counter }}</td>
+            <td class="border px-4 py-2">{{ purchase.product }}</td>
+            <td class="border px-4 py-2">{{ purchase.vendor.full_name }}</td>
+            <td class="border px-4 py-2">{{ purchase.qty }}</td>
+            <td class="border px-4 py-2">{{ purchase.price }}</td>
+            <td class="border px-4 py-2">{{ purchase.total_amt }}</td>
+            <td class="border px-4 py-2">{{ purchase.pur_date }}</td>
+            <td class="border px-4 py-2">
+              <a href="{% url 'main:purchase_detail' purchase.id %}" class="btn btn-primary btn-sm">Details</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td class="border px-4 py-2" colspan="8">No purchases available.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

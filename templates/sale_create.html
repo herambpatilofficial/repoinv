@@ -1,0 +1,106 @@
+<!-- sale_create.html -->
+{% extends 'base.html' %}
+
+{% block title %}Create Sale{% endblock %}
+
+{% block content %}
+    <h1 class="text-2xl font-bold mb-4">Create Sale</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+            <label for="customer" class="block font-bold mb-2">Customer</label>
+            <select id="customer" name="customer" class="border rounded py-2 px-3 w-full">
+                <option value="">Select customer</option>
+                {% for customer in customers %}
+                    <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
+                {% endfor %}
+            </select>
+            {% if errors.customer %}
+                <p class="text-red-500 text-sm mt-1">{{ errors.customer }}</p>
+            {% endif %}
+        </div>
+        <div id="productRows">
+            <div class="flex items-center mb-2">
+                <div class="mr-2">
+                    <label class="block font-bold mb-2">Product</label>
+                    <select name="product[]" class="border rounded py-2 px-3 w-full">
+                        <option value="">Select product</option>
+                        {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.product.title }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if errors.product %}
+                        <p class="text-red-500 text-sm mt-1">{{ errors.product }}</p>
+                    {% endif %}
+                </div>
+                <div class="mr-2">
+                    <label class="block font-bold mb-2">Quantity</label>
+                    <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full" min="1" value="1">
+                    {% if errors.qty %}
+                        <p class="text-red-500 text-sm mt-1">{{ errors.qty }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block font-bold mb-2">Price</label>
+                    <input type="number" name="price[]" class="border rounded py-2 px-3 w-full" min="0" step="0.01">
+                    {% if errors.price %}
+                        <p class="text-red-500 text-sm mt-1">{{ errors.price }}</p>
+                    {% endif %}
+                </div>
+                <button type="button" class="ml-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded removeProductRow">Delete</button>
+            </div>
+        </div>
+        <div class="mb-4">
+            <button type="button" id="addProductRow" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Add Product</button>
+        </div>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Create Sale</button>
+    </form>
+
+    <script>
+        // Function to add a new product row
+        function addProductRow() {
+            const productRows = document.getElementById('productRows');
+            const newRow = document.createElement('div');
+            newRow.className = 'flex items-center mb-2';
+            newRow.innerHTML = `
+                <div class="mr-2">
+                    <label class="block font-bold mb-2">Product</label>
+                    <select name="product[]" class="border rounded py-2 px-3 w-full">
+                        <option value="">Select product</option>
+                        {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.product.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mr-2">
+                    <label class="block font-bold mb-2">Quantity</label>
+                    <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full" min="1" value="1">
+                </div>
+                <div>
+                    <label class="block font-bold mb-2">Price</label>
+                    <input type="number" name="price[]" class="border rounded py-2 px-3 w-full" min="0" step="0.01">
+                </div>
+                <button type="button" class="ml-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded removeProductRow">Delete</button>
+            `;
+            productRows.appendChild(newRow);
+        }
+
+        // Function to remove a product row
+        function removeProductRow(event) {
+            const row = event.target.closest('.flex');
+            if (row) {
+                row.remove();
+            }
+        }
+
+        // Add event listener for adding a product row
+        document.getElementById('addProductRow').addEventListener('click', addProductRow);
+
+        // Add event listener for removing a product row
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('removeProductRow')) {
+                removeProductRow(event);
+            }
+        });
+    </script>
+{% endblock %}

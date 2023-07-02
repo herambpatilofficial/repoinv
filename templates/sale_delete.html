@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Delete Sale</h2>
+    <p>Are you sure you want to delete the following sale?</p>
+    <p><strong>Product:</strong> {{ sale.product.title }}</p>
+    <p><strong>Customer:</strong> {{ sale.customer.customer_name }}</p>
+    <p><strong>Quantity:</strong> {{ sale.qty }}</p>
+    <p><strong>Price:</strong> {{ sale.price }}</p>
+    <form method="POST" action="{% url 'sale_delete' sale.pk %}" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    <a href="{% url 'sale_list' %}" class="btn btn-secondary">Cancel</a>
+  </div>
+{% endblock %}

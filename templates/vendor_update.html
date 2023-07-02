@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Update Vendor</h1>
+  
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+      <label for="full_name">Full Name:</label>
+      <input type="text" id="full_name" name="full_name" value="{{ vendor.full_name }}" required>
+    </div>
+    <div>
+      <label for="photo">Photo:</label>
+      <input type="file" id="photo" name="photo" accept="image/*">
+    </div>
+    {% if vendor.photo %}
+      <div>
+        <label>Current Photo:</label>
+        <img src="{{ vendor.photo.url }}" alt="Vendor Photo" style="max-width: 200px;">
+      </div>
+    {% endif %}
+    <div>
+      <label for="address">Address:</label>
+      <textarea id="address" name="address" required>{{ vendor.address }}</textarea>
+    </div>
+    <div>
+      <label for="mobile">Mobile:</label>
+      <input type="text" id="mobile" name="mobile" value="{{ vendor.mobile }}" required>
+    </div>
+    <div>
+      <label for="status">Status:</label>
+      <input type="checkbox" id="status" name="status" {% if vendor.status %}checked{% endif %}>
+    </div>
+    <button type="submit">Update</button>
+  </form>
+  
+{% endblock %}

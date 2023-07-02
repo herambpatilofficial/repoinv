@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-semibold mb-4">Customers</h2>
+  <a href="{% url 'main:customer_create' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-3">Add Customer</a>
+  <table class="border-collapse border border-gray-300">
+    <thead>
+      <tr>
+        <th class="border border-gray-300 px-4 py-2">Customer Name</th>
+        <th class="border border-gray-300 px-4 py-2">Mobile</th>
+        <th class="border border-gray-300 px-4 py-2">Address</th>
+        <th class="border border-gray-300 px-4 py-2"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in customers %}
+        <tr>
+          <td class="border border-gray-300 px-4 py-2">{{ customer.customer_name }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ customer.customer_mobile }}</td>
+          <td class="border border-gray-300 px-4 py-2">{{ customer.customer_address }}</td>
+          <td class="border border-gray-300 px-4 py-2">
+            <a href="{% url 'main:customer_detail' customer.id %}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded">View</a>
+            <a href="{% url 'main:customer_update' customer.id %}" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded">Edit</a>
+            <a href="{% url 'main:customer_delete' customer.id %}" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">Delete</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td class="border border-gray-300 px-4 py-2" colspan="4">No customers found.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Vendors</h1>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full border border-gray-300">
+      <thead>
+        <tr>
+          <th class="border-b px-4 py-2 bg-gray-100">Full Name</th>
+          <th class="border-b px-4 py-2 bg-gray-100">Photo</th>
+          <th class="border-b px-4 py-2 bg-gray-100">Address</th>
+          <th class="border-b px-4 py-2 bg-gray-100">Mobile</th>
+          <th class="border-b px-4 py-2 bg-gray-100">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vendor in vendors %}
+          <tr>
+            <td class="border-b px-4 py-2">{{ vendor.full_name }}</td>
+            <td class="border-b px-4 py-2">
+              {% if vendor.photo %}
+                <img src="{{ vendor.photo.url }}" alt="Vendor Photo" class="w-16 h-16 object-cover rounded-full">
+              {% else %}
+                No Photo Available
+              {% endif %}
+            </td>
+            <td class="border-b px-4 py-2">{{ vendor.address }}</td>
+            <td class="border-b px-4 py-2">{{ vendor.mobile }}</td>
+            <td class="border-b px-4 py-2">
+              {% if vendor.status %}
+                <span class="inline-block px-2 py-1 text-sm font-semibold text-green-700 bg-green-200 rounded-full">Active</span>
+              {% else %}
+                <span class="inline-block px-2 py-1 text-sm font-semibold text-red-700 bg-red-200 rounded-full">Inactive</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td class="border-b px-4 py-2 text-center" colspan="5">No vendors found.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-4">
+    <h2>Unit Detail</h2>
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Title:</th>
+          <td>{{ unit.title }}</td>
+        </tr>
+        <tr>
+          <th>Short Name:</th>
+          <td>{{ unit.short_name }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <a href="{% url 'unit_list' %}" class="btn btn-secondary">Back to List</a>
+  </div>
+{% endblock %}
