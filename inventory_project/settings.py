@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",  # new
     'django.contrib.staticfiles',
     'main',
-    'corsheaders',
+    
 
 ]
 
@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    
     'django.middleware.common.CommonMiddleware',
 ]
 
@@ -64,10 +64,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 CSRF_COOKIE_SECURE = False
 
 
-CORS_ORIGIN_WHITELIST = [
-    'https://7325-117-207-202-112.ngrok-free.app',
-    # Add any other origins you want to allow
-]
+
 
 CSRF_TRUSTED_ORIGINS = [
     'https://7325-117-207-202-112.ngrok-free.app',
