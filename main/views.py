@@ -430,13 +430,20 @@ from io import BytesIO
 from reportlab.pdfgen import canvas
 
 
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from io import BytesIO
+from reportlab.lib.pagesizes import A4, A5, A6, letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
 def bill_generate_pdf(request, sale_id):
     # Get the sale object
     sale = get_object_or_404(Sale, id=sale_id, customer__vendor=request.user)
 
     # Calculate the total price for each product in the sale
     line_items = []
-    total_price = 0
     grandtotal = 0
     for item in sale.sale_items.all():
         product = item.product
@@ -445,38 +452,116 @@ def bill_generate_pdf(request, sale_id):
         line_items.append({
             'product': product,
             'quantity': quantity,
-            'price': price/quantity,
-            'total_price':  price
+            'price': price / quantity,
+            'total_price': price
         })
-        print(price, quantity, quantity * price, grandtotal)
-        grandtotal +=  price 
+        grandtotal += price
 
-    # Generate PDF bill
+    # Set up PDF document
     pdf_buffer = BytesIO()
-    pdf = canvas.Canvas(pdf_buffer)
+    pdf = SimpleDocTemplate(pdf_buffer, pagesize=letter)
 
-    # Set up PDF content
-    pdf.setFont("Helvetica-Bold", 16)
-    pdf.drawString(100, 750, "Bill Details")
-    pdf.setFont("Helvetica", 12)
-    pdf.drawString(100, 700, f"Sale ID: {sale.id}")
-    pdf.drawString(100, 680, f"Customer: {sale.customer}")
-    pdf.drawString(100, 660, f"Vendor: {sale.vendor}")
-    pdf.drawString(100, 640, f"Sale Date: {sale.sale_date}")
-    pdf.drawString(100, 620, f"Product \t Quantity \t Price \t Total Price")
+    # Define styles
+    styles = getSampleStyleSheet()
+    title_style = styles["Title"]
+    title_style.alignment = 1  # Center alignment
+    title_style.fontSize = 22
+    subtitle_style = ParagraphStyle("subtitle", parent=styles["Heading1"], fontSize=14)
+    subtitle_style.alignment = 1  # Center alignment
+    subtitle_style.fontSize = 18
+    subtitle_style.spaceAfter = 0.5 * subtitle_style.fontSize
+    header_style = styles["Heading3"]
+    header_style.alignment = 1  # Center alignment
+    table_header_style = styles["Heading4"]
+    table_header_style.alignment = 1  # Center alignment
+    table_data_style = styles["Normal"]
+    table_data_style.alignment = 1  # Center alignment
+    table_data_style.fontSize = 15
+    table_data_style.spaceAfter = 0.5 * table_data_style.fontSize
 
-    # Draw line items
-    y = 600
+    # Build PDF content
+    content = []
+
+    separator_line = Paragraph('<u>' + "_" * 40 + '</u>', table_data_style)
+
+    content.append(separator_line)
+
+    # Title
+    title = Paragraph("TRYAMBAKAM RUDRAKSH", title_style)
+    content.append(title)
+
+    # Phone number
+    phone_number = Paragraph("Phone number: 8805244048", subtitle_style)
+    content.append(phone_number)
+
+    # Separator line
+    
+    content.append(separator_line)
+
+    contente3 = f"Sale ID: {sale.id}"
+    contente2 = f"Customer: {sale.customer}"
+    contente1 = f"Vendor: {sale.vendor}"
+    contente0 = f"Sale Date: {sale.sale_date}"
+
+    
+
+    content.append(Paragraph(contente3, table_data_style))
+    content.append(Paragraph(contente2, table_data_style))
+    content.append(Paragraph(contente1, table_data_style))
+    content.append(Paragraph(contente0, table_data_style))
+
+    content.append(separator_line)
+
+    # Tax invoice
+    tax_invoice = Paragraph("TAX INVOICE", header_style)
+    content.append(tax_invoice)
+
+
+
+    # Line items table
+    table_data = [["Product", "Quantity", "Price", "Total Price"]]
     for item in line_items:
-        pdf.drawString(100, y, f"{item['product']} \t {item['quantity']} \t {item['price']} \t {item['total_price']}")
-        y -= 20
+        table_data.append([
+            str(item["product"]),
+            str(item["quantity"]),
+            str(item["price"]),
+            str(item["total_price"])
+        ])
 
-    pdf.drawString(100, y-40, f"Total Price: {grandtotal}")
+    table_style = TableStyle([
+        
+        ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, 0), 17),
+        ("BOTTOMPADDING", (0, 0),(-1, -1), 12),
+        ("TOPPADDING", (0, 0), (-1, 0), 12),
+        
+        ("FONTSIZE", (0, 1), (-1, -1), 17),
+        # Set margins to bottom of table 
+        
+    ])
+    
+    table = Table(table_data)
+    table.setStyle(table_style)
+    content.append(table)
 
-    # Save PDF to buffer
-    pdf.showPage()
-    pdf.save()
-    pdf_buffer.seek(0)
+    # content.append(separaStor_line)
+
+
+    # Total Price
+    content.append(separator_line)
+    total_price = Paragraph(f"<b>Total Price:</b> {grandtotal}", subtitle_style)
+    content.append(total_price)
+
+    # content.append(separator_line)
+
+
+    # Thank you
+    thank_you = Paragraph("Thank you", subtitle_style)
+    content.append(thank_you)
+
+    # Generate PDF
+    pdf.build(content)
 
     # Set up response with PDF content for download
     response = HttpResponse(content_type='application/pdf')
@@ -484,7 +569,6 @@ def bill_generate_pdf(request, sale_id):
     response.write(pdf_buffer.getvalue())
 
     return response
-
 
 
 class InventoryForm(forms.ModelForm):
