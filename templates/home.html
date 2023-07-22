@@ -1,8 +1,193 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="mt-8">
-        <h1 class="text-3xl font-bold mb-4">Welcome to the Inventory Management System</h1>
-        <p class="text-lg">This is the home page of the Inventory Management System. Use the navigation links above to access different sections of the system.</p>
-    </div>
+
+{% load static %}
+
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tryambakam Rudraksh</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* Custom CSS for styling */
+    /* You can add your custom styles here */
+    <style>
+        /* Custom CSS for styling */
+    
+        /* Override the link color to white */
+        a {
+          color: #ffffff;
+        }
+    
+        /* Style the hero section with a background image */
+        header {
+          
+          background-size: cover;
+          background-position: center;
+          min-height: 500px;
+          display: flex;
+          align-items: center;
+        }
+    
+        /* Increase the font size and line height for better readability */
+        h1,
+        h2 {
+          line-height: 1.3;
+        }
+    
+        h1 {
+          font-size: 3.5rem;
+        }
+    
+        h2 {
+          font-size: 2.5rem;
+        }
+    
+        /* Add padding to sections for better separation */
+        section {
+          padding: 3rem 0;
+        }
+    
+        /* Style the call-to-action buttons */
+        .btn {
+          background-color: #ff6600;
+          transition: background-color 0.3s ease;
+        }
+    
+        .btn:hover {
+          background-color: #ff8533;
+        }
+    
+        /* Center the footer text */
+        footer p {
+          text-align: center;
+        }
+    
+        /* Add media queries for responsive design */
+        @media (max-width: 768px) {
+          /* Reduce the font size on smaller screens */
+          h1 {
+            font-size: 2.5rem;
+          }
+    
+          h2 {
+            font-size: 2rem;
+          }
+    
+          /* Increase the top margin for the hero section to avoid overlapping */
+          header {
+            margin-top: 80px;
+          }
+        }
+      </style>
+  </style>
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Hero section with parallax effect -->
+    <header class="relative bg-orange-100 py-16">
+      <!-- Parallax background -->
+      <div class="absolute inset-0 bg-cover bg-center" style="background-image: url({% static 'rudraksh.jpg' %});"></div>
+      <div class="absolute inset-0 bg-orange-500 opacity-25"></div>
+      <div class="container mx-auto px-4 relative">
+        <div class="text-center">
+          <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">Welcome to Tryambakam Rudraksh</h1>
+          <p class="text-lg text-white mb-8">Your destination for genuine and powerful Rudraksh beads.</p>
+          <a href="#about" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded transition-all duration-200">Learn More</a>
+        </div>
+      </div>
+    </header>
+  
+    <!-- About section -->
+    <section id="about" class="bg-gray-100 py-16">
+      <div class="container mx-auto px-4">
+        <div class="md:flex md:items-center">
+          <div class="md:w-1/2">
+            <h2 class="text-3xl font-bold mb-4">About Us</h2>
+            <p class="text-gray-800">Tryambakam Rudraksh is a renowned franchise that specializes in selling genuine and
+              high-quality Rudraksh beads. We understand the spiritual significance and healing properties of Rudraksh,
+              and our mission is to bring these powerful beads to people who seek spiritual growth and well-being.</p>
+          </div>
+          <div class="md:w-1/2 mt-6 md:mt-0">
+            <!-- Image of Rudraksh bead -->
+            <img src="{% static 'single-rudraksha-08_2048x.webp'%}" alt="Rudraksh Bead" class="rounded-md">
+          </div>
+        </div>
+      </div>
+    </section>
+
+  
+    <!-- Rudraksh information section with image -->
+    <section class="bg-white py-16">
+      <div class="container mx-auto px-4">
+        <div class="text-center">
+          <h2 class="text-3xl font-bold mb-4">Discover the Power of Rudraksh</h2>
+          <p class="text-gray-600">Rudraksh beads have been used for centuries in various cultures for their spiritual
+            and healing properties. These beads are believed to bring peace, positivity, and protection to the wearer.
+            They are known to balance energies and enhance meditation practices.</p>
+        </div>
+        <!-- Image of Rudraksh beads collection -->
+        <div class="mt-12 text-center">
+          <img src="{% static 'single-rudraksha-08_2048x.webp'%}" alt="Rudraksh Beads Collection" class="rounded-md shadow-lg">
+        </div>
+      </div>
+    </section>
+  
+    <!-- Contact section with background image -->
+    <section class="bg-gray-100 py-16" style="background-image: url({% static 'rudraksh.jpg'%}); background-size: cover;">
+      <div class="container mx-auto px-4">
+        <div class="text-center text-white">
+          <h2 class="text-3xl font-bold mb-4">Get in Touch</h2>
+          {% comment %} Contact number {% endcomment %}
+          <p class="text-gray-200">Call us at <a href="tel:+919850309919" class="underline">+919850309919</a></p>
+          {% comment %} Email address {% endcomment %}
+          <p class="text-gray-200">Have questions or want to explore our collection of Rudraksh beads? Contact us now!</p>
+          {% comment %} Address for dark background {% endcomment %}
+          <p class="text-gray-200">Visit us at SHIVNERI LODGING, CH.SHIVAJI MAHARAJ CHOWK, TRIMBAKESHWAR, Trimbak, Maharashtra 422212</p>
+
+          {% comment %} <a href="" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4 inline-block">Email
+            us</a>
+        </div> {% endcomment %}
+      </div>
+    </section>
+  
+    <!-- Footer -->
+    <footer class="bg-orange-500 py-4 text-white text-center">
+      <div class="container mx-auto px-4">
+        <p>&copy; 2023 Tryambakam Rudraksh. All rights reserved.</p>
+      </div>
+    </footer>
+  
+    <!-- Add the spinning Rudraksh animation -->
+    <style>
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+  
+      .spinning-rudraksh {
+        animation: spin 4s linear infinite;
+      }
+    </style>
+  
+    <!-- Smooth scroll effect for "Learn More" button -->
+    <script>
+      const learnMoreBtn = document.querySelector('a[href="#about"]');
+      learnMoreBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const aboutSection = document.getElementById('about');
+        aboutSection.scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    </script>
+  
+  
 {% endblock %}

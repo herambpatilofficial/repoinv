@@ -20,13 +20,13 @@
             {% endif %}
         </div>
         <div id="productRows">
-            <div class="flex items-center mb-2">
+            <div class="flex items-center mb-2 product-row">
                 <div class="mr-2">
                     <label class="block font-bold mb-2">Product</label>
-                    <select name="product[]" class="border rounded py-2 px-3 w-full">
+                    <select name="product[]" class="border rounded py-2 px-3 w-full product-select">
                         <option value="">Select product</option>
                         {% for product in products %}
-                            <option value="{{ product.id }}">{{ product.product.title }}</option>
+                            <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.title }}</option>
                         {% endfor %}
                     </select>
                     {% if errors.product %}
@@ -35,23 +35,29 @@
                 </div>
                 <div class="mr-2">
                     <label class="block font-bold mb-2">Quantity</label>
-                    <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full" min="1" value="1">
+                    <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full quantity-input" min="1" value="1">
                     {% if errors.qty %}
                         <p class="text-red-500 text-sm mt-1">{{ errors.qty }}</p>
                     {% endif %}
                 </div>
                 <div>
                     <label class="block font-bold mb-2">Price</label>
-                    <input type="number" name="price[]" class="border rounded py-2 px-3 w-full" min="0" step="0.01">
-                    {% if errors.price %}
-                        <p class="text-red-500 text-sm mt-1">{{ errors.price }}</p>
-                    {% endif %}
+                    <input type="hidden" name="price[]" class="border rounded py-2 px-3 w-full price-input" min="0" step="0.01">
+                    <input type="text" class="border rounded py-2 px-3 w-full price-display" disabled>
+                </div>
+                <div>
+                    <label class="block font-bold mb-2">Total</label>
+                    <input type="text" class="border rounded py-2 px-3 w-full total-display" disabled>
                 </div>
                 <button type="button" class="ml-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded removeProductRow">Delete</button>
             </div>
         </div>
         <div class="mb-4">
             <button type="button" id="addProductRow" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Add Product</button>
+        </div>
+        <div class="mb-4">
+            <label class="block font-bold mb-2">Bill Total</label>
+            <input type="text" id="billTotal" class="border rounded py-2 px-3 w-full" disabled>
         </div>
         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Create Sale</button>
     </form>
@@ -61,46 +67,116 @@
         function addProductRow() {
             const productRows = document.getElementById('productRows');
             const newRow = document.createElement('div');
-            newRow.className = 'flex items-center mb-2';
+            newRow.className = 'flex items-center mb-2 product-row';
             newRow.innerHTML = `
                 <div class="mr-2">
                     <label class="block font-bold mb-2">Product</label>
-                    <select name="product[]" class="border rounded py-2 px-3 w-full">
+                    <select name="product[]" class="border rounded py-2 px-3 w-full product-select">
                         <option value="">Select product</option>
                         {% for product in products %}
-                            <option value="{{ product.id }}">{{ product.product.title }}</option>
+                            <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="mr-2">
                     <label class="block font-bold mb-2">Quantity</label>
-                    <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full" min="1" value="1">
+                    <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full quantity-input" min="1" value="1">
                 </div>
                 <div>
                     <label class="block font-bold mb-2">Price</label>
-                    <input type="number" name="price[]" class="border rounded py-2 px-3 w-full" min="0" step="0.01">
+                    <input type="hidden" name="price[]" class="border rounded py-2 px-3 w-full price-input" min="0" step="0.01">
+                    <input type="text" class="border rounded py-2 px-3 w-full price-display" disabled>
+                </div>
+                <div>
+                    <label class="block font-bold mb-2">Total</label>
+                    <input type="text" class="border rounded py-2 px-3 w-full total-display" disabled>
                 </div>
                 <button type="button" class="ml-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded removeProductRow">Delete</button>
             `;
             productRows.appendChild(newRow);
+            attachProductChangeEvent(newRow); // Attach change event listener for the new row
+            attachQuantityChangeEvent(newRow); // Attach change event listener for the new row
         }
 
         // Function to remove a product row
         function removeProductRow(event) {
-            const row = event.target.closest('.flex');
+            const row = event.target.closest('.product-row');
             if (row) {
                 row.remove();
+                calculateBillTotal();
             }
         }
 
+        // Function to update the displayed price and total when a product is selected
+        function updateDisplayedPrice(event) {
+            const selectedOption = event.target.options[event.target.selectedIndex];
+            const priceInput = event.target.closest('.product-row').querySelector('.price-input');
+            const priceDisplay = event.target.closest('.product-row').querySelector('.price-display');
+            const price = selectedOption.getAttribute('data-price');
+            priceInput.value = price;
+            priceDisplay.value = price;
+            updateTotal(event.target.closest('.product-row'));
+            calculateBillTotal();
+        }
+
+        // Function to update the total when quantity is changed
+        function updateTotal(row) {
+            const quantityInput = row.querySelector('.quantity-input');
+            const totalDisplay = row.querySelector('.total-display');
+            const priceInput = row.querySelector('.price-input');
+            const quantity = parseInt(quantityInput.value, 10);
+            const price = parseFloat(priceInput.value);
+            const total = (quantity * price).toFixed(2);
+            totalDisplay.value = total;
+        }
+
+        // Function to attach change event listener for product select dropdown
+        function attachProductChangeEvent(row) {
+            const productSelect = row.querySelector('.product-select');
+            productSelect.addEventListener('change', updateDisplayedPrice);
+        }
+
+        // Function to attach change event listener for quantity input
+        function attachQuantityChangeEvent(row) {
+            const quantityInput = row.querySelector('.quantity-input');
+            quantityInput.addEventListener('input', function (event) {
+                updateTotal(row);
+                calculateBillTotal();
+            });
+        }
+
+        // Function to calculate and update the Bill total
+        function calculateBillTotal() {
+            const totalDisplays = document.querySelectorAll('.total-display');
+            let billTotal = 0;
+            totalDisplays.forEach(display => {
+                const total = parseFloat(display.value);
+                if (!isNaN(total)) {
+                    billTotal += total;
+                }
+            });
+            const billTotalInput = document.getElementById('billTotal');
+            billTotalInput.value = billTotal.toFixed(2);
+        }
+
         // Add event listener for adding a product row
-        document.getElementById('addProductRow').addEventListener('click', addProductRow);
+        document.getElementById('addProductRow').addEventListener('click', function () {
+            addProductRow();
+        });
 
         // Add event listener for removing a product row
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             if (event.target.classList.contains('removeProductRow')) {
                 removeProductRow(event);
             }
         });
+
+        // Attach initial change event listener for the first row
+        const initialRow = document.querySelector('.product-row');
+        attachProductChangeEvent(initialRow);
+        attachQuantityChangeEvent(initialRow);
+
+        // Calculate initial bill total
+        calculateBillTotal();
     </script>
 {% endblock %}

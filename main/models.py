@@ -21,7 +21,6 @@ class Vendor(models.Model):
         related_name='vendor_profile'
     )
     full_name = models.CharField(max_length=50)
-    photo = models.ImageField(upload_to="vendor/")
     address = models.TextField()
     mobile = models.CharField(max_length=15)
     status = models.BooleanField(default=False)
@@ -48,7 +47,7 @@ class Product(models.Model):
     title = models.CharField(max_length=50)
     detail = models.TextField()
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to="product/")
+    price = models.FloatField(default=0)
 
     class Meta:
         verbose_name_plural = '3. Products'
@@ -61,7 +60,7 @@ class Customer(models.Model):
     customer_name = models.CharField(max_length=50, blank=True, default=" ")
     customer_mobile = models.CharField(max_length=50, default="0")
     customer_address = models.TextField(default=" ")
-    vendor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='customers',default=1)
+    vendor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='customers', default=1)
 
     def __str__(self):
         return self.customer_name
@@ -74,7 +73,7 @@ class Purchase(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     qty = models.FloatField()
-    price = models.FloatField()
+    # total_amt should be calculated automatically
     total_amt = models.FloatField(default=0)
     pur_date = models.DateTimeField(auto_now_add=True)
 
@@ -82,8 +81,9 @@ class Purchase(models.Model):
         verbose_name_plural = '4. Purchases'
 
     def save(self, *args, **kwargs):
-        self.total_amt = self.qty * self.price
+        self.total_amt = self.qty * self.product.price
         super(Purchase, self).save(*args, **kwargs)
+        self.total_amt = self.qty * self.product.price
 
         # Update inventory for the specific vendor and product
         inventory, created = Inventory.objects.get_or_create(product=self.product, vendor=self.vendor)
@@ -101,8 +101,6 @@ class Purchase(models.Model):
         super(Purchase, self).delete(*args, **kwargs)
 
 
-
-
 class Sale(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, default=1)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
@@ -117,11 +115,10 @@ class SaleItem(models.Model):
     sale = models.ForeignKey(Sale, related_name='sale_items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     qty = models.FloatField(default=0)
-    price = models.FloatField(default=0)
     total_amt = models.FloatField(default=0)
 
     def save(self, *args, **kwargs):
-        self.total_amt = self.qty * self.price
+        self.total_amt = self.qty * self.product.price
         super().save(*args, **kwargs)
 
         # Update inventory for the specific vendor and product
@@ -138,6 +135,7 @@ class SaleItem(models.Model):
         inventory.save()
 
         super().delete(*args, **kwargs)
+
 
 class Inventory(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -164,13 +162,3 @@ class Inventory(models.Model):
             return sale.sale_date
 
 
-@receiver(post_delete, sender=Vendor)
-def delete_vendor_photo(sender, instance, **kwargs):
-    if instance.photo:
-        instance.photo.delete()
-
-
-@receiver(post_delete, sender=Product)
-def delete_product_photo(sender, instance, **kwargs):
-    if instance.photo:
-        instance.photo.delete()

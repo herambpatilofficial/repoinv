@@ -10,7 +10,8 @@
         <th class="border border-gray-300 px-4 py-2">Customer Name</th>
         <th class="border border-gray-300 px-4 py-2">Mobile</th>
         <th class="border border-gray-300 px-4 py-2">Address</th>
-        <th class="border border-gray-300 px-4 py-2"></th>
+        <th class="border border-gray-300 px-4 py-2">Actions</th>
+       
       </tr>
     </thead>
     <tbody>
@@ -21,7 +22,6 @@
           <td class="border border-gray-300 px-4 py-2">{{ customer.customer_address }}</td>
           <td class="border border-gray-300 px-4 py-2">
             <a href="{% url 'main:customer_detail' customer.id %}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded">View</a>
-            <a href="{% url 'main:customer_update' customer.id %}" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded">Edit</a>
             <a href="{% url 'main:customer_delete' customer.id %}" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">Delete</a>
           </td>
         </tr>

@@ -16,6 +16,7 @@
                     <th class="py-2 px-4 border-b">Title</th>
                     <th class="py-2 px-4 border-b">Detail</th>
                     <th class="py-2 px-4 border-b">Unit</th>
+                    <th class="py-2 px-4 border-b">Price</th>
                     <th class="py-2 px-4 border-b">Actions</th>
                 </tr>
             </thead>
@@ -25,6 +26,7 @@
                     <td class="py-2 px-4 border-b">{{ product.title }}</td>
                     <td class="py-2 px-4 border-b">{{ product.detail }}</td>
                     <td class="py-2 px-4 border-b">{{ product.unit.title }}</td>
+                    <td class="py-2 px-4 border-b">{{ product.price }}</td>
                     <td class="py-2 px-4 border-b">
                         <div class="flex">
                             <a href="{% url 'main:product_detail' product.id %}" class="text-blue-500 hover:underline mr-2">View</a>
@@ -35,7 +37,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td class="py-2 px-4 border-b text-center" colspan="4">No products found.</td>
+                    <td class="py-2 px-4 border-b text-center" colspan="5">No products found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

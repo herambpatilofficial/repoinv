@@ -22,30 +22,31 @@
   <!-- Sales List -->
   <div class="overflow-x-auto">
     <table class="min-w-full bg-white border border-gray-300">
-      <thead>
-        <tr>
-          <th class="px-6 py-3 bg-gray-100 border-b text-left">Customer</th>
-          <th class="px-6 py-3 bg-gray-100 border-b text-left">Vendor</th>
-          <th class="px-6 py-3 bg-gray-100 border-b text-left">Date</th>
-          <th class="px-6 py-3 bg-gray-100 border-b text-right">Total Amount</th>
-          <th class="px-6 py-3 bg-gray-100 border-b text-center">Status</th>
-          <th class="px-6 py-3 bg-gray-100 border-b text-center">Action</th>
-        </tr>
-      </thead>
+ 
       <tbody>
         {% for sale in sales %}
+        <thead>
+          <tr>
+            <th class="px-6 py-3 bg-red-100 border-b text-left">Customer</th>
+            <th class="px-6 py-3 bg-red-100 border-b text-left">Vendor</th>
+            <th class="px-6 py-3 bg-red-100 border-b text-left">Date</th>
+            <th class="px-6 py-3 bg-red-100 border-b text-right">Total Amount</th>
+            
+            <th class="px-6 py-3 bg-red-100 border-b text-center">Action</th>
+          </tr>
+        </thead>
           <tr>
             <td class="px-6 py-4 border-b text-left">{{ sale.customer }}</td>
             <td class="px-6 py-4 border-b text-left">{{ sale.vendor }}</td>
             <td class="px-6 py-4 border-b text-left">{{ sale.sale_date }}</td>
             <td class="px-6 py-4 border-b text-right">{{ sale.total_amount }}</td>
-            <td class="px-6 py-4 border-b text-center">
+            {% comment %} <td class="px-6 py-4 border-b text-center">
               {% if sale.billed %}
                 <span class="px-2 py-1 text-sm text-green-800 bg-green-200 rounded-full">Billed</span>
               {% else %}
                 <span class="px-2 py-1 text-sm text-red-800 bg-red-200 rounded-full">Not Billed</span>
               {% endif %}
-            </td>
+            </td> {% endcomment %}
             <td class="px-6 py-4 border-b text-center">
               <a href="{% url 'main:sale_detail' sale.id %}" class="text-blue-500 hover:text-blue-700">View</a>
             </td>
@@ -66,7 +67,7 @@
                     <tr>
                       <td class="px-6 py-4 border-b">{{ item.product }}</td>
                       <td class="px-6 py-4 border-b">{{ item.qty }}</td>
-                      <td class="px-6 py-4 border-b">{{ item.price }}</td>
+                      <td class="px-6 py-4 border-b">{{ item.product.price }}</td>
                       <td class="px-6 py-4 border-b">{{ item.total_amt }}</td>
                     </tr>
                   {% empty %}
@@ -78,10 +79,18 @@
               </table>
             </td>
           </tr>
+          <tr>
+            <td colspan="6" class="px-6 py-4 text-center"></td>
+          </tr>
         {% empty %}
           <tr>
             <td colspan="6" class="px-6 py-4 text-center">No sales found.</td>
           </tr>
+          {% comment %} Add empty row ] {% endcomment %}
+          <tr>
+            <td colspan="6" class="px-6 py-4 text-center"></td>
+          </tr>
+
         {% endfor %}
       </tbody>
     </table>

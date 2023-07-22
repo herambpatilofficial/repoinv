@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="text-2xl font-bold mb-4">Product Detail</h1>
+
+  <div class="mb-4">
+    <h2 class="text-xl font-semibold">{{ product.title }}</h2>
+    <p class="mb-2"><strong>Detail:</strong> {{ product.detail }}</p>
+    <p class="mb-2"><strong>Unit:</strong> {{ product.unit.title }}</p>
+    <p class="mb-2"><strong>Price:</strong> {{ product.price }}</p>
+  </div>
+
+  <div>
+    <a href="{% url 'main:product_list' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">Back to Product List</a>
+    <a href="{% url 'main:product_update' product.id %}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded">Edit Product</a>
+    <a href="{% url 'main:product_delete' product.id %}" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded">Delete Product</a>
+  </div>
+{% endblock %}

@@ -4,6 +4,34 @@
   <div class="container mx-auto mt-8">
     <div class="bg-white shadow-lg rounded-lg">
       <h2 class="text-2xl bg-gray-800 text-white px-6 py-4 rounded-t-lg">Inventory List</h2>
+      {% if request.user.is_superuser %}
+      <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="py-3 px-6 text-left">Product</th>
+            <th class="py-3 px-6 text-left">Purchase Quantity</th>
+            <th class="py-3 px-6 text-left">Sale Quantity</th>
+            <th class="py-3 px-6 text-left">Total Balance Quantity</th>
+            <th class="py-3 px-6 text-left">Vendor</th>
+            <th class="py-3 px-6 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          {% for item in inventory %}
+          <tr>
+            <td class="py-4 px-6">{{ item.product.title }}</td>
+            <td class="py-4 px-6">{{ item.pur_qty }}</td>
+            <td class="py-4 px-6">{{ item.sale_qty }}</td>
+            <td class="py-4 px-6">{{ item.total_bal_qty }}</td>
+            <td class="py-4 px-6">{{ item.vendor }}</td>
+            <td class="py-4 px-6">
+              <a href="{% url 'main:inventory_detail' item.pk %}" class="text-blue-600 hover:underline">Details</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
       <table class="min-w-full divide-y divide-gray-300">
         <thead class="bg-gray-100">
           <tr>
@@ -15,19 +43,20 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          {% for inventory in inventory %}
+          {% for item in inventory %}
           <tr>
-            <td class="py-4 px-6">{{ inventory.product.title }}</td>
-            <td class="py-4 px-6">{{ inventory.pur_qty }}</td>
-            <td class="py-4 px-6">{{ inventory.sale_qty }}</td>
-            <td class="py-4 px-6">{{ inventory.total_bal_qty }}</td>
+            <td class="py-4 px-6">{{ item.product.title }}</td>
+            <td class="py-4 px-6">{{ item.pur_qty }}</td>
+            <td class="py-4 px-6">{{ item.sale_qty }}</td>
+            <td class="py-4 px-6">{{ item.total_bal_qty }}</td>
             <td class="py-4 px-6">
-              <a href="{% url 'main:inventory_detail' inventory.pk %}" class="text-blue-600 hover:underline">Details</a>
+              <a href="{% url 'main:inventory_detail' item.pk %}" class="text-blue-600 hover:underline">Details</a>
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+      {% endif %}
     </div>
   </div>
 {% endblock %}

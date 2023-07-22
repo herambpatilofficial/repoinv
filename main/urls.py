@@ -40,4 +40,16 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     # url for billing
-    path('bill_generation/<int:sale_id>/', views.bill_generate_pdf, name='bill_generation'),]
+    path('bill_generation/<int:sale_id>/', views.bill_generate_pdf, name='bill_generation'),
+    # Urls for export to excel
+
+    path('export_vendors_csv', views.export_vendors_csv, name='export_vendors_csv'),
+    path('export_products_csv', views.export_products_csv, name='export_products_csv'),
+    path('export_customers_csv', views.export_customers_csv, name='export_customers_csv'),
+    path('export_purchases_csv', views.export_purchases_csv, name='export_purchases_csv'),
+    path('export_sales_csv', views.export_sales_csv, name='export_sales_csv'),
+    path('export_inventories_csv', views.export_inventories_csv, name='export_inventories_csv'),
+    #
+
+    
+    ]
