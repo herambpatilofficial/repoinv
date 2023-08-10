@@ -21,45 +21,35 @@
   
   <!-- Sales List -->
   <div class="overflow-x-auto">
-    <table class="min-w-full bg-white border border-gray-300">
- 
-      <tbody>
+    
         {% for sale in sales %}
+      <table class="min-w-full bg-white border border-gray-900">
+ 
+          <tbody>
         <thead>
           <tr>
-            <th class="px-6 py-3 bg-red-100 border-b text-left">Customer</th>
-            <th class="px-6 py-3 bg-red-100 border-b text-left">Vendor</th>
-            <th class="px-6 py-3 bg-red-100 border-b text-left">Date</th>
-            <th class="px-6 py-3 bg-red-100 border-b text-right">Total Amount</th>
-            
-            <th class="px-6 py-3 bg-red-100 border-b text-center">Action</th>
+            <th class="px-6 py-3 bg-blue-100 border-b text-left ">Customer : {{ sale.customer }} <br> Vendor: {{ sale.vendor }} <br>Date: {{ sale.sale_date }} Total: {{ sale.total_sale_amount }} <br> <a href="{% url 'main:sale_detail' sale.id %}" class="text-blue-500 hover:text-blue-700">Details</a> </th>
+
+           
           </tr>
         </thead>
+        
+          </tbody>
+          </table>
+
+          <table class="min-w-full bg-white border border-gray-300">
+ 
+            <tbody>
+          
           <tr>
-            <td class="px-6 py-4 border-b text-left">{{ sale.customer }}</td>
-            <td class="px-6 py-4 border-b text-left">{{ sale.vendor }}</td>
-            <td class="px-6 py-4 border-b text-left">{{ sale.sale_date }}</td>
-            <td class="px-6 py-4 border-b text-right">{{ sale.total_amount }}</td>
-            {% comment %} <td class="px-6 py-4 border-b text-center">
-              {% if sale.billed %}
-                <span class="px-2 py-1 text-sm text-green-800 bg-green-200 rounded-full">Billed</span>
-              {% else %}
-                <span class="px-2 py-1 text-sm text-red-800 bg-red-200 rounded-full">Not Billed</span>
-              {% endif %}
-            </td> {% endcomment %}
-            <td class="px-6 py-4 border-b text-center">
-              <a href="{% url 'main:sale_detail' sale.id %}" class="text-blue-500 hover:text-blue-700">View</a>
-            </td>
-          </tr>
-          <tr>
-            <td colspan="6" class="border-t">
-              <table class="w-full border border-gray-300 my-4">
+            
+              <table class="w-full border border-gray-300 my-0 mb-10">
                 <thead>
                   <tr>
-                    <th class="px-6 py-3 bg-gray-100 border-b">Product</th>
-                    <th class="px-6 py-3 bg-gray-100 border-b">Quantity</th>
-                    <th class="px-6 py-3 bg-gray-100 border-b">Price</th>
-                    <th class="px-6 py-3 bg-gray-100 border-b">Total Amount</th>
+                    <th class="px-6 py-3 bg-gray-100 border-b text-left">Product</th>
+                    <th class="px-6 py-3 bg-gray-100 border-b text-left">Quantity</th>
+                    <th class="px-6 py-3 bg-gray-100 border-b text-left">Price</th>
+                    <th class="px-6 py-3 bg-gray-100 border-b text-left">Total Amount</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -67,7 +57,7 @@
                     <tr>
                       <td class="px-6 py-4 border-b">{{ item.product }}</td>
                       <td class="px-6 py-4 border-b">{{ item.qty }}</td>
-                      <td class="px-6 py-4 border-b">{{ item.product.price }}</td>
+                      <td class="px-6 py-4 border-b">Rs. {{ item.product.price }}</td>
                       <td class="px-6 py-4 border-b">{{ item.total_amt }}</td>
                     </tr>
                   {% empty %}
@@ -76,8 +66,8 @@
                     </tr>
                   {% endfor %}
                 </tbody>
-              </table>
-            </td>
+      </table>
+            
           </tr>
           <tr>
             <td colspan="6" class="px-6 py-4 text-center"></td>

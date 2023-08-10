@@ -49,7 +49,19 @@ urlpatterns = [
     path('export_purchases_csv', views.export_purchases_csv, name='export_purchases_csv'),
     path('export_sales_csv', views.export_sales_csv, name='export_sales_csv'),
     path('export_inventories_csv', views.export_inventories_csv, name='export_inventories_csv'),
-    #
+    # Expense urls
+    path('expense/', views.expense_list, name='expense_list'),
+    path('expense/<int:expense_id>/', views.expense_detail, name='expense_detail'),
+    path('expense/create/', views.expense_create, name='expense_create'),
+    path('expense/update/<int:expense_id>/', views.expense_update, name='expense_update'),
+    path('expense/delete/<int:expense_id>/', views.expense_delete, name='expense_delete'),
 
-    
+    # Dashboard urls
+    path('master_dashboard/', views.master_dashboard, name='master_dashboard'),
+    path('vendor_dashboard/', views.vendor_dashboard, name='vendor_dashboard'),
+    # Vendor dashboard superuser
+    path('vendor_dashboard/<int:vendor_id>/', views.vendor_dashboard_superuser, name='vendor_dashboard'),
+
+
+
     ]

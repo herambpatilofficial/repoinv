@@ -6,6 +6,9 @@
     <table class="table-auto border-collapse w-full">
       <tbody>
         <tr>
+          <th class="py-2 px-4 border">Vendor</th>
+          <td class="py-2 px-4 border">{{ inventory.vendor }}</td>
+        <tr>
           <th class="py-2 px-4 border">Product:</th>
           <td class="py-2 px-4 border">{{ inventory.product.title }}</td>
         </tr>
@@ -21,9 +24,7 @@
           <th class="py-2 px-4 border">Total Balance Quantity:</th>
           <td class="py-2 px-4 border">{{ inventory.total_bal_qty }}</td>
         </tr>
-        <tr>
-          <th class="py-2 px-4 border">Total Balance Amount:</th>
-          <td class="py-2 px-4 border">{{ inventory.total_bal_amt }}</td>
+        
       </tbody>
     </table>
     <a href="{% url 'main:inventory_list' %}" class="inline-block mt-4 py-2 px-4 bg-blue-500 text-white hover:bg-blue-600 rounded">Back to Inventory List</a>

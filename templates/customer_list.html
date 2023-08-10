@@ -3,15 +3,16 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
   <h2 class="text-2xl font-semibold mb-4">Customers</h2>
-  <a href="{% url 'main:customer_create' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-3">Add Customer</a>
-  <table class="border-collapse border border-gray-300">
+  <a href="{% url 'main:customer_create' %}" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 my-2 rounded mb-3">Add Customer</a>
+  <table class="table-auto w-full border-collapse border border-gray-300 my-5">
     <thead>
       <tr>
-        <th class="border border-gray-300 px-4 py-2">Customer Name</th>
-        <th class="border border-gray-300 px-4 py-2">Mobile</th>
-        <th class="border border-gray-300 px-4 py-2">Address</th>
-        <th class="border border-gray-300 px-4 py-2">Actions</th>
-       
+        <th class="border border-gray-300 px-4 py-2 text-left">Customer Name</th>
+        <th class="border border-gray-300 px-4 py-2 text-left">Mobile</th>
+        {% if request.user.is_superuser %}        <th class="border border-gray-300 px-4 py-2 text-left">Vendor</th>{% endif %}
+
+        <th class="border border-gray-300 px-4 py-2 text-left">Email Address</th>
+        <th class="border border-gray-300 px-4 py-2 text-left">Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -19,10 +20,10 @@
         <tr>
           <td class="border border-gray-300 px-4 py-2">{{ customer.customer_name }}</td>
           <td class="border border-gray-300 px-4 py-2">{{ customer.customer_mobile }}</td>
+          {% if request.user.is_superuser %}<td class="border border-gray-300 px-4 py-2 text-left">{{customer.vendor.vendor_profile.full_name}}</td>{% endif %}
           <td class="border border-gray-300 px-4 py-2">{{ customer.customer_address }}</td>
           <td class="border border-gray-300 px-4 py-2">
-            <a href="{% url 'main:customer_detail' customer.id %}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded">View</a>
-            <a href="{% url 'main:customer_delete' customer.id %}" class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded">Delete</a>
+              <a href="{% url 'main:customer_delete' customer.id %}" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded ml-2">Delete</a>
           </td>
         </tr>
       {% empty %}

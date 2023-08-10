@@ -22,15 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_random_secret_key()
+SECRET_KEY = 'qwertyuiopasdfghjklzxcvbnm1234567890!@#$%^&*()_+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
-
-
 
 # Application definition
 
@@ -44,8 +41,8 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",  # new
     'django.contrib.staticfiles',
     'main',
+    'django.contrib.humanize',
     
-
 ]
 
 MIDDLEWARE = [
@@ -55,21 +52,12 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',      
     'django.middleware.common.CommonMiddleware',
 ]
 
 CORS_ORIGIN_ALLOW_ALL = False
 CSRF_COOKIE_SECURE = False
-
-
-
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://7325-117-207-202-112.ngrok-free.app',
-    # Other trusted origins
-]
 
 
 ROOT_URLCONF = 'inventory_project.urls'
@@ -144,7 +132,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles" 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # new
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = ''
 MEDIA_ROOT = os.path.join(BASE_DIR, 'vendor')
 # Default primary key field type

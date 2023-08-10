@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<h1 class="text-3xl font-extrabold">Tryambakam Rudraksh Master Dashboard</h1>
+
+<div class="container mx-auto py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Vendors</h2>
+            <div>
+                <p class="text-purple-600 text-6xl font-bold m-4">{{ vendors|length }}</p>
+            </div>
+           <a href="{% url 'main:vendor_list' %}"> <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-all m-3">View Vendors</button></a>
+        </div>
+        <!-- Total Sales -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Sales</h2>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-xl text-bold">This Month:</p>
+                    <p class="text-blue-600 text-5xl font-bold my-5" id="this-month-sales">₹ {{ total_sales_amount | intcomma}}</p>
+                    <p class="text-gray-600 text-xl m-1" id="overall-sales">Overall: ₹ {{ overall_sales_amount| intcomma }}</p>
+                
+                </div>
+                <a href="{% url 'main:sale_list' %}"> <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-all m-3">View Sales</button></a>
+        
+               
+            </div>
+        </div>
+
+        <!-- Total Products in Inventory -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Products</h2>
+            <div>
+                <p class="text-yellow-600 text-6xl font-bold m-4" >{{ products|length }}</p>
+            </div>
+            <a href="{% url 'main:product_list' %}"> <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-all m-3">View Products</button></a>
+        
+        </div>
+
+        <!-- Total Customers -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Customers</h2>
+            <div>
+                <p class="text-purple-600 text-6xl font-bold m-4">{{ customers|length }}</p>
+            </div>
+            <a href="{% url 'main:customer_list' %}"> <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-all m-3">View Customers</button></a>
+        
+        </div>
+
+        <!-- Total Expenses -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Expenses</h2>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-xl ">This Month:</p>
+                    <p class="text-green-600 text-5xl font-bold my-5" id="this-month-expenses">₹ {{ this_month_expenses | intcomma}}</p>
+                    <p class="text-gray-600 text-xl" id="overall-expenses">Overall : ₹ {{ overall_expenses| intcomma}}</p>
+                </div>
+                <a href="{% url 'main:expense_list' %}"> <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-all m-3">View Vendors</button></a>
+        
+            </div>
+        </div>
+
+        <!-- Total Purchases -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Purchases</h2>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-xl ">This Month:</p>
+                    <p class="text-red-600 text-5xl font-bold my-5" id="this-month-purchases">₹ {{ total_purchases_amount| intcomma}}</p>
+                    <p class="text-gray-600 text-xl" id="overall-purchases">Overall : ₹ {{ overall_purchases_amount | intcomma}}</p>
+                </div>
+                <a href="{% url 'main:purchase_list' %}"> <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-all m-3">View Purchases</button></a>
+        
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    let show_this_month_sales = true;
+    let show_this_month_expenses = true;
+    let show_this_month_purchases = true;
+
+    function toggleSales() {
+        const thisMonthSales = document.querySelector('#this-month-sales');
+        const overallSales = document.querySelector('#overall-sales');
+        show_this_month_sales = !show_this_month_sales;
+        if (show_this_month_sales) {
+            thisMonthSales.classList.remove('hidden');
+            overallSales.classList.add('hidden');
+        } else {
+            thisMonthSales.classList.add('hidden');
+            overallSales.classList.remove('hidden');
+        }
+    }
+
+    function toggleExpenses() {
+        const thisMonthExpenses = document.querySelector('#this-month-expenses');
+        const overallExpenses = document.querySelector('#overall-expenses');
+        show_this_month_expenses = !show_this_month_expenses;
+        if (show_this_month_expenses) {
+            thisMonthExpenses.classList.remove('hidden');
+            overallExpenses.classList.add('hidden');
+        } else {
+            thisMonthExpenses.classList.add('hidden');
+            overallExpenses.classList.remove('hidden');
+        }
+    }
+
+    function togglePurchases() {
+        const thisMonthPurchases = document.querySelector('#this-month-purchases');
+        const overallPurchases = document.querySelector('#overall-purchases');
+        show_this_month_purchases = !show_this_month_purchases;
+        if (show_this_month_purchases) {
+            thisMonthPurchases.classList.remove('hidden');
+            overallPurchases.classList.add('hidden');
+        } else {
+            thisMonthPurchases.classList.add('hidden');
+            overallPurchases.classList.remove('hidden');
+        }
+    }
+</script>
+{% endblock content %}

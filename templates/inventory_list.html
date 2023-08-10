@@ -5,6 +5,23 @@
     <div class="bg-white shadow-lg rounded-lg">
       <h2 class="text-2xl bg-gray-800 text-white px-6 py-4 rounded-t-lg">Inventory List</h2>
       {% if request.user.is_superuser %}
+      {% comment %} Filters {% endcomment %}
+      <div class="mx-4 my-5">
+        <form action="{% url 'main:inventory_list' %}" method="GET">
+          <div class="flex items-center">
+            <label for="customer-filter" class="mr-2">Vendor: </label>
+            <select name="vendor" id="vendor-filter" class="px-2 py-1 border border-gray-300">
+              <option value="">All</option>
+              {% for customer in vendors %}
+                <option value="{{ customer.id }}" {% if customer.id == selected_customer %}selected{% endif %}>{{ customer }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="ml-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Filter</button>
+          </div>
+        </form>
+      </div>
+   
+
       <table class="min-w-full divide-y divide-gray-300">
         <thead class="bg-gray-100">
           <tr>

@@ -43,11 +43,23 @@ class Unit(models.Model):
         return self.title
 
 
+class ProductCategory(models.Model):
+    title = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name_plural = '8. Product Categories'
+
+    def __str__(self):
+        return self.title
+
+
 class Product(models.Model):
     title = models.CharField(max_length=50)
     detail = models.TextField()
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     price = models.FloatField(default=0)
+    product_code = models.CharField(max_length=10, unique=True, default=0)
+    category = models.ForeignKey(ProductCategory, on_delete=models.SET_NULL, null=True, blank=True, default=0)
 
     class Meta:
         verbose_name_plural = '3. Products'
@@ -68,10 +80,9 @@ class Customer(models.Model):
     class Meta:
         verbose_name_plural = '7. Customers'
 
-
 class Purchase(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='vendor_purchases')
     qty = models.FloatField()
     # total_amt should be calculated automatically
     total_amt = models.FloatField(default=0)
@@ -101,16 +112,36 @@ class Purchase(models.Model):
         super(Purchase, self).delete(*args, **kwargs)
 
 
+from django.db import models
+from django.db.models import F
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+from django.db import models
+from django.db.models import F, Sum
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
 class Sale(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, default=1)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, default=0, related_name='customer_sales')
     sale_date = models.DateTimeField(auto_now_add=True)
     billed = models.BooleanField(default=False)
+    
 
     class Meta:
         verbose_name_plural = 'Sales'
 
+    # New property for total sale amount (read-only)
+    @property
+    def total_sale_amount(self):
+        tsa = 0
+        for saleitem in self.sale_items.all():
+            tsa = tsa + saleitem.qty * saleitem.product.price
+        return tsa
+             
 
+        
 class SaleItem(models.Model):
     sale = models.ForeignKey(Sale, related_name='sale_items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -138,7 +169,7 @@ class SaleItem(models.Model):
 
 
 class Inventory(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_inventory')
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, default=None, null=True)
 
     pur_qty = models.FloatField(default=0)
@@ -162,3 +193,14 @@ class Inventory(models.Model):
             return sale.sale_date
 
 
+class Expense(models.Model):
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
+    title = models.CharField(max_length=50)
+    detail = models.TextField()
+    amount = models.FloatField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = '7. Expenses'
+
+    

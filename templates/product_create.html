@@ -27,6 +27,19 @@
     </div>
 
     <div class="mb-4">
+      <label for="product_code" class="block font-semibold">Product Code:</label>
+      <input type="text" name="product_code" id="product_code" class="w-full border border-gray-300 rounded py-2 px-3">
+    </div>
+    <div class="mb-4">
+      <label for="category" class="block font-semibold">Category:</label>
+      <select name="category" id="category" class="w-full border border-gray-300 rounded py-2 px-3">
+        <option value="" disabled selected>Select category</option>
+        {% for category in product_category %}
+          <option value="{{ category.id }}">{{ category.title }}</option>
+        {% endfor %}
+      </select>
+
+    <div class="mb-4">
       <label for="price" class="block font-semibold">Price: </label>
       <textarea name="price" id="price" class="w-full border border-gray-300 rounded py-2 px-3"></textarea>
     </div>

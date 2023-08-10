@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mx-auto my-8">
+    <h1 class="text-2xl font-bold mb-4">Delete Expense</h1>
+    <p>Are you sure you want to delete the expense with title: <strong>{{ expense.title }}</strong>?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded">Delete</button>
+      <a href="{% url 'main:expense_detail' expense.id %}" class="text-blue-600 hover:underline">Cancel</a>
+    </form>
+  </div>
+{% endblock %}

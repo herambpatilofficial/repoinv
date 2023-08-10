@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    /* styles.css */
+/* Custom styles for the Create New Expense form */
+
+/* Center the form within the container */
+form {
+  margin: 0 auto;
+  width: 800px;
+  padding: 1em;
+  border: 1px solid #ccc;
+  border-radius: 1em;
+  background-color: #f5f5f5;
+  
+}
+
+/* Style the input fields */
+input[type="text"],
+input[type="date"],
+input[type="number"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-block: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+/* Style the labels */
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+/* Style the Save Expense button */
+button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+/* Style the Cancel link */
+#cancel {
+  color: #dc3545;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+</style>
+
+<h1 class="text-2xl font-bold mb-4">Create New Expense</h1>
+
+<form method="post" class="mb-4">
+  {% csrf_token %}
+
+  <!-- Add a hidden input field for the vendor ID -->
+  <input type="hidden" name="vendor" value="{{ request.user.id }}">
+
+  {{ form.as_p }}
+
+  <button type="submit" class="bg-blue-600 text-white py-2 px-4 my-5 rounded">Save Expense</button>
+  <a href="{% url 'main:expense_list' %}" class="text-red-600 hover:underline" id="cancel"><button class="bg-red-600 text-white py-2 px-4 my-5 rounded">Cancel</button></a>
+  
+</form>
+
+{% endblock %}

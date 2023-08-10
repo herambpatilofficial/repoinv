@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Vendor, Product, Customer, Purchase, Sale, Inventory, SaleItem, Unit
+from .models import Vendor, Product, Customer, Purchase, Sale, Inventory, SaleItem, Unit, Expense, ProductCategory
 from django import forms
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
@@ -10,11 +10,18 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_protect
 
-
+from django.views.decorators.clickjacking import xframe_options_exempt
 # Home view
 
 def home(request):
-    return render(request, 'home.html')
+    vendors = Vendor.objects.all()
+    products = Product.objects.all()
+    customers = Customer.objects.all()
+    purchases = Purchase.objects.all()
+    sales = Sale.objects.all()
+    inventories = Inventory.objects.all()
+    return render(request, 'home.html', {'vendors': vendors, 'products': products, 'customers': customers, 'purchases': purchases, 'sales': sales, 'inventories': inventories})
+    
 
 
 
@@ -46,6 +53,19 @@ class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
         fields = '__all__'
+
+class ExpenseForm(forms.ModelForm):
+    class Meta:
+        model = Expense
+        fields = ['title', 'detail', 'amount']
+
+    def __init__(self, *args, **kwargs):
+        # Get the current logged-in vendor from the kwargs or None if not present
+        vendor = kwargs.pop('vendor', None)
+        super().__init__(*args, **kwargs)
+        if vendor:
+            # Set the initial value of the vendor field to the vendor ID
+            self.initial['vendor'] = vendor.id
 
 
 from django.forms import inlineformset_factory
@@ -95,7 +115,13 @@ def vendor_delete(request, vendor_id):
 
 def product_list(request):
     products = Product.objects.all()
-    return render(request, 'product_list.html', {'products': products})
+    product_code = request.GET.get('product_code')
+    if product_code:
+        products = products.filter(product_code__icontains=product_code)
+    paginator = Paginator(products, 10)  # Show 10 products per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'product_list.html', {'products': products, 'page_obj': page_obj})
 
 
 def product_detail(request, product_id):
@@ -105,6 +131,7 @@ def product_detail(request, product_id):
 
 def product_create(request):
     units = Unit.objects.all()
+
     if request.method == 'POST':
         form = ProductForm(request.POST)
         if form.is_valid():
@@ -112,7 +139,7 @@ def product_create(request):
             return redirect('main:product_list')
     else:
         form = ProductForm()
-    return render(request, 'product_create.html', {'form': form, 'units': units})
+    return render(request, 'product_create.html', {'form': form, 'units': units, 'product_category': ProductCategory.objects.all()})
 
 
 def product_update(request, product_id):
@@ -146,7 +173,10 @@ def customer_list(request):
 
 
 def customer_detail(request, customer_id):
-    customer = get_object_or_404(Customer, id=customer_id, vendor__user=request.user)
+    if request.user.is_superuser:
+        customer = get_object_or_404(Customer, id=customer_id)
+    else:
+        customer = get_object_or_404(Customer, id=customer_id, vendor__user=request.user)
     return render(request, 'customer_detail.html', {'customer': customer})
 
 
@@ -201,7 +231,11 @@ def customer_delete(request, customer_id):
 
 @ login_required
 def purchase_list(request):
-    purchases = Purchase.objects.all()
+    if request.user.is_superuser:
+        purchases = Purchase.objects.all()
+    else:
+        purchases = Purchase.objects.filter(vendor=request.user.vendor_profile)
+    
     return render(request, 'purchase_list.html', {'purchases': purchases})
 
 
@@ -249,17 +283,23 @@ def purchase_delete(request, purchase_id):
 
 
 def sale_list(request):
+    selected_customer = request.GET.get('customer')
     if request.user.is_superuser:
         sales = Sale.objects.all()
+        print("Super")
+        if selected_customer:
+            sales = Sale.objects.filter(customer_id=selected_customer).order_by('-sale_date')
+        else:
+            sales = Sale.objects.all().order_by('-sale_date')
     else:
-        sales = Sale.objects.filter(customer__vendor=request.user)
-    selected_customer = request.GET.get('customer')
+       
+        if selected_customer:
+            sales = Sale.objects.filter(customer_id=selected_customer, vendor=request.user.vendor_profile).order_by('-sale_date')
+        else:
+            sales = Sale.objects.filter(vendor=request.user.vendor_profile).order_by('-sale_date')
+        print("Not Super")
+        print(sales)
 
-    # Filter sales based on the selected customer if it's not empty
-    if selected_customer:
-        sales = Sale.objects.filter(customer_id=selected_customer).order_by('-sale_date')
-    else:
-        sales = Sale.objects.all().order_by('-sale_date')
 
     # Pagination
     paginator = Paginator(sales, 10)  # Show 10 sales per page
@@ -288,8 +328,10 @@ def sale_detail(request, sale_id):
 
 def sale_create(request):
     # Get products in inventory for the current vendor
-    products = Product.objects.filter(inventory__vendor=request.user.vendor_profile)
+    products = Product.objects.filter(product_inventory__vendor=request.user.vendor_profile)
     customers = Customer.objects.filter(vendor=request.user)
+    
+    
 
     if request.method == 'POST':
         errors = {}
@@ -312,6 +354,7 @@ def sale_create(request):
                 errors['qty'] = 'Quantity field is required.'
             elif not price:
                 errors['price'] = 'Price field is required.'
+            
             else:
                 try:
                     quantity = int(quantity)
@@ -320,6 +363,10 @@ def sale_create(request):
                     if quantity <= 0 or price <= 0:
                         errors['qty'] = 'Quantity must be a positive integer.'
                         errors['price'] = 'Price must be a positive number.'
+
+                    elif get_object_or_404(Inventory, product__id=product_id, vendor=request.user.vendor_profile).total_bal_qty < quantity:
+                        errors['qty'] = 'Quantity must not exceed available stock.'
+
                     else:
                         total_price += quantity * price
                 except ValueError:
@@ -328,7 +375,7 @@ def sale_create(request):
 
             if not errors.get('product') and not errors.get('qty') and not errors.get('price'):
                 try:
-                    product = get_object_or_404(Product, id=product_id, inventory__vendor=request.user.vendor_profile)
+                    product = get_object_or_404(Product, id=product_id)
                     sale_items.append({
                         'product': product,
                         'quantity': quantity,
@@ -342,13 +389,13 @@ def sale_create(request):
                 customer = get_object_or_404(Customer, id=customer_id, vendor=request.user)
 
                 with transaction.atomic():
-                    sale = Sale.objects.create(customer=customer)
+                    sale = Sale.objects.create(customer=customer, vendor=request.user.vendor_profile)
 
                     for sale_item in sale_items:
                         product = sale_item['product']
                         quantity = sale_item['quantity']
                         price = sale_item['price']
-                        SaleItem.objects.create(sale=sale, product=product, qty=quantity)
+                        SaleItem.objects.create(sale=sale, product=product, qty=quantity, )
 
                 return redirect('main:sale_detail', sale_id=sale.id)
             except Customer.DoesNotExist:
@@ -607,12 +654,23 @@ class InventoryForm(forms.ModelForm):
 
 
 def inventory_list(request):
+    vendors = Vendor.objects.all()
+
     # If user is superuser, show all inventory
     if request.user.is_superuser:
         inventory = Inventory.objects.all()
     else:
         inventory = Inventory.objects.filter(vendor=request.user.vendor_profile)
-    return render(request, 'inventory_list.html', {'inventory': inventory})
+    # Filter inventory by vendor
+    if request.user.is_superuser:
+        selected_vendor = request.GET.get('vendor', None)
+        if selected_vendor:
+            inventory = Inventory.objects.filter(vendor__id=selected_vendor)
+        else:
+            inventory = Inventory.objects.all()
+
+
+    return render(request, 'inventory_list.html', {'inventory': inventory, 'vendors': vendors})
 
 
 def inventory_detail(request, inventory_id):
@@ -693,6 +751,7 @@ class ProductResource(resources.ModelResource):
 
 
 class CustomerResource(resources.ModelResource):
+     
     class Meta:
         model = Customer
 
@@ -704,14 +763,19 @@ class PurchaseResource(resources.ModelResource):
     class Meta:
         model = Purchase
 
+from import_export import resources
 
 class SaleResource(resources.ModelResource):
-    vendor = resources.Field(attribute='vendor__full_name')  # Access the full_name attribute of the related Vendor model
-    customer = resources.Field(attribute='customer__customer_name')  # Access the customer_name attribute of the related Customer model
+    vendor = resources.Field(attribute='vendor__full_name')
+    customer = resources.Field(attribute='customer__customer_name')
+    
+    total = resources.Field(attribute='total_sale_amount')
 
     class Meta:
         model = Sale
+        fields = ('vendor', 'customer' ,'total', 'sale_date')  # Add other fields you want to include in the CSV
 
+   
 
 class SaleItemResource(resources.ModelResource):
     product = resources.Field(attribute='product__title')  # Access the title attribute of the related Product model
@@ -728,9 +792,6 @@ class InventoryResource(resources.ModelResource):
         model = Inventory
 
 
-# ... (existing code for views)
-
-
 @staff_member_required
 def export_vendors_csv(request):
     vendors_resource = VendorResource()
@@ -741,30 +802,46 @@ def export_vendors_csv(request):
 
 @staff_member_required
 def export_products_csv(request):
+    
     products_resource = ProductResource()
     dataset = products_resource.export()
     response = HttpResponse(dataset.csv, content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="products.csv"'
     return response
 
-@staff_member_required
+@login_required
 def export_customers_csv(request):
+    if request.user.is_superuser:
+        queryset = Customer.objects.all()
+    else:
+        queryset = Customer.objects.filter(vendor=request.user.vendor_profile)
     customers_resource = CustomerResource()
-    dataset = customers_resource.export()
+    dataset = customers_resource.export(queryset)
     response = HttpResponse(dataset.csv, content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="customers.csv"'
     return response
 
-@staff_member_required
+@login_required
 def export_purchases_csv(request):
+    if request.user.is_superuser:
+        queryset = Purchase.objects.all()
+    else:
+        queryset = Purchase.objects.filter(vendor=request.user.vendor_profile)
     purchases_resource = PurchaseResource()
-    dataset = purchases_resource.export()
+    dataset = purchases_resource.export(queryset)
     response = HttpResponse(dataset.csv, content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="purchases.csv"'
     return response
 
-@staff_member_required
+@login_required
 def export_sales_csv(request):
+    if request.user.is_superuser:
+        queryset = Sale.objects.all()
+        print("superuser")
+    else:
+        queryset = Sale.objects.filter(vendor=request.user.vendor_profile)
+        print("nonsuper", queryset)
+
     sales_resource = SaleResource()
     dataset = sales_resource.export()
     response = HttpResponse(dataset.csv, content_type='text/csv')
@@ -786,3 +863,184 @@ def export_inventories_csv(request):
     response = HttpResponse(dataset.csv, content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="inventories.csv"'
     return response
+
+# Expense views
+
+def expense_list(request):
+    if request.user.is_superuser:
+        expenses = Expense.objects.all()
+    else:
+        expenses = Expense.objects.filter(vendor=request.user.vendor_profile)
+
+    # Filter expensesby date
+    date_from = request.GET.get('date_from', None)
+    date_to = request.GET.get('date_to', None)
+    if date_from and date_to:
+        expenses = expenses.filter(date__range=[date_from, date_to])
+
+
+    return render(request, 'expense_list.html', {'expenses': expenses})
+
+def expense_detail(request, expense_id):
+    expense = get_object_or_404(Expense, id=expense_id)
+    return render(request, 'expense_detail.html', {'expense': expense})
+
+
+def expense_create(request):
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST)
+        if form.is_valid():
+            # Assign the current vendor to the new expense entry
+            form.instance.vendor = request.user.vendor_profile
+            form.save()
+            return redirect('main:expense_list')
+    else:
+        form = ExpenseForm(vendor=request.user.vendor_profile)
+    
+    return render(request, 'expense_create.html', {'form': form})
+
+def expense_update(request, expense_id):
+    expense = get_object_or_404(Expense, id=expense_id)
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            form.save()
+            return redirect('main:expense_detail', expense_id=expense.id)
+    else:
+        form = ExpenseForm(instance=expense)
+    return render(request, 'expense_update.html', {'form': form, 'expense': expense})
+
+def expense_delete(request, expense_id):
+    expense = get_object_or_404(Expense, id=expense_id)
+    if request.method == 'POST':
+        expense.delete()
+        return redirect('main:expense_list')
+    return render(request, 'expense_delete.html', {'expense': expense})
+
+
+# Generate reports for vendors for their sales, customers and purchases in csv format
+# def export_sales_csv(request):
+#     sales_resource = SaleResource()
+#     dataset = sales_resource.export()
+#     response = HttpResponse(dataset.csv, content_type='text/csv')
+#     response['Content-Disposition'] = 'attachment; filename="sales.csv"'
+#     return response
+
+import datetime
+# Superuser dashboard views
+@staff_member_required
+def master_dashboard(request):
+    vendors = Vendor.objects.all()
+    products = Product.objects.all()
+    customers = Customer.objects.all()   
+   
+    sale_items = SaleItem.objects.all()
+    inventories = Inventory.objects.all()
+    
+    overall_purchases_amount = 0
+    for purchase in Purchase.objects.all():
+        overall_purchases_amount += purchase.total_amt
+    
+    overall_sales_amount = 0
+    for sale in Sale.objects.all():
+        overall_sales_amount += sale.total_sale_amount
+
+    overall_expenses = 0
+    for expense in Expense.objects.all():
+        overall_expenses += expense.amount       
+
+    
+    # calculate total purchases amount for this month
+    total_purchases_amount = 0
+    for purchase in Purchase.objects.filter(pur_date__month=datetime.datetime.now().month):
+        total_purchases_amount += purchase.total_amt
+    
+    total_sales_amount = 0
+    for sale in Sale.objects.filter(sale_date__month=datetime.datetime.now().month):
+        total_sales_amount += sale.total_sale_amount
+    
+    this_month_expenses = 0
+    for expense in Expense.objects.filter(date__month=datetime.datetime.now().month):
+        this_month_expenses += expense.amount
+
+    return render(request, 'master_dashboard.html', { 'vendors': vendors, 'products': products, 'customers': customers, 'sale_items': sale_items, 'inventories': inventories, 'overall_purchases_amount': overall_purchases_amount, 'overall_sales_amount': overall_sales_amount, 'overall_expenses': overall_expenses, 'total_purchases_amount': total_purchases_amount, 'total_sales_amount': total_sales_amount, 'this_month_expenses': this_month_expenses})
+
+# Vendor dashboard views
+@login_required
+def vendor_dashboard(request):
+    products = Inventory.objects.filter(vendor=request.user.vendor_profile)
+    customers = Customer.objects.filter(vendor=request.user)
+    form = ExpenseForm(request.POST)
+   
+    overall_purchases_amount = 0
+    for purchase in Purchase.objects.filter(vendor=request.user.vendor_profile):
+        overall_purchases_amount += purchase.total_amt
+    
+    overall_sales_amount = 0
+    for sale in Sale.objects.filter(vendor=request.user.vendor_profile):
+        overall_sales_amount += sale.total_sale_amount
+    
+    overall_expenses = 0
+    for expense in Expense.objects.filter(vendor=request.user.vendor_profile):
+        overall_expenses += expense.amount
+
+    
+
+    
+    # calculate total purchases amount for this month
+    total_purchases_amount = 0
+    for purchase in Purchase.objects.filter(vendor=request.user.vendor_profile, pur_date__month=datetime.datetime.now().month):
+        total_purchases_amount += purchase.total_amt
+
+    total_sales_amount = 0
+    for sale in Sale.objects.filter(vendor=request.user.vendor_profile, sale_date__month=datetime.datetime.now().month):
+        total_sales_amount += sale.total_sale_amount
+
+    this_month_expenses = 0
+    for expense in Expense.objects.filter(vendor=request.user.vendor_profile, date__month=datetime.datetime.now().month):
+        this_month_expenses += expense.amount     
+
+    return render(request, 'vendor_dashboard.html', {'products': products, 'customers': customers, 'overall_purchases_amount': overall_purchases_amount, 'overall_sales_amount': overall_sales_amount, 'overall_expenses': overall_expenses, 'total_purchases_amount': total_purchases_amount, 'total_sales_amount': total_sales_amount, 'this_month_expenses': this_month_expenses, 'form': form})
+
+
+# Vendor dashboard for superuser
+@staff_member_required
+def vendor_dashboard_superuser(request, vendor_id):
+    vendor = get_object_or_404(Vendor, id=vendor_id)
+    purchases = Purchase.objects.filter(vendor=vendor)
+    sales = Sale.objects.filter(vendor=vendor)
+    sale_items = SaleItem.objects.filter(vendor=vendor)
+    inventories = Inventory.objects.filter(vendor=vendor)
+    expenses = Expense.objects.filter(vendor=vendor)
+    customers = Customer.objects.filter(vendor=vendor)
+    
+
+    return render(request, 'vendor_dashboard_superuser.html', {'vendor': vendor})
+# import quote_plus
+import csv
+from urllib.parse import quote_plus
+from django.http import HttpResponse
+from .models import Sale
+
+# def export_sales_csv(request):
+#     sales = Sale.objects.filter(
+#         vendor=request.user.vendor_profile if not request.user.is_superuser else None
+#     )
+
+#     response = HttpResponse(content_type="text/csv")
+#     response["Content-Disposition"] = 'attachment; filename="sales.csv"'
+
+#     writer = csv.writer(response)
+
+#     # Write the headers
+#     writer.writerow(["id", "customer name", "vendor name", "Total Amount", "sale date"])
+
+#     # Write the data rows
+#     for sale in sales:
+#         customer_name = sale.customer.customer_name
+#         vendor_name = quote_plus(sale.vendor.full_name) if sale.vendor else ""
+#         total_sale_amount = sale.total_sale_amount if sale.total_sale_amount else ""
+#         sale_date = sale.sale_date.strftime("%Y-%m-%d") if sale.sale_date else ""
+#         writer.writerow([sale.id, customer_name, vendor_name, total_sale_amount ,sale_date])
+
+#     return response

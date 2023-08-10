@@ -4,81 +4,90 @@
 {% block title %}Create Sale{% endblock %}
 
 {% block content %}
-    <h1 class="text-2xl font-bold mb-4">Create Sale</h1>
-    <form method="post">
-        {% csrf_token %}
-        <div class="mb-4">
-            <label for="customer" class="block font-bold mb-2">Customer</label>
-            <select id="customer" name="customer" class="border rounded py-2 px-3 w-full">
-                <option value="">Select customer</option>
-                {% for customer in customers %}
-                    <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
-                {% endfor %}
-            </select>
-            {% if errors.customer %}
-                <p class="text-red-500 text-sm mt-1">{{ errors.customer }}</p>
-            {% endif %}
-        </div>
-        <div id="productRows">
-            <div class="flex items-center mb-2 product-row">
-                <div class="mr-2">
-                    <label class="block font-bold mb-2">Product</label>
-                    <select name="product[]" class="border rounded py-2 px-3 w-full product-select">
-                        <option value="">Select product</option>
-                        {% for product in products %}
-                            <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.title }}</option>
-                        {% endfor %}
-                    </select>
-                    {% if errors.product %}
-                        <p class="text-red-500 text-sm mt-1">{{ errors.product }}</p>
-                    {% endif %}
-                </div>
-                <div class="mr-2">
-                    <label class="block font-bold mb-2">Quantity</label>
-                    <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full quantity-input" min="1" value="1">
-                    {% if errors.qty %}
-                        <p class="text-red-500 text-sm mt-1">{{ errors.qty }}</p>
-                    {% endif %}
-                </div>
-                <div>
-                    <label class="block font-bold mb-2">Price</label>
-                    <input type="hidden" name="price[]" class="border rounded py-2 px-3 w-full price-input" min="0" step="0.01">
-                    <input type="text" class="border rounded py-2 px-3 w-full price-display" disabled>
-                </div>
-                <div>
-                    <label class="block font-bold mb-2">Total</label>
-                    <input type="text" class="border rounded py-2 px-3 w-full total-display" disabled>
-                </div>
-                <button type="button" class="ml-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded removeProductRow">Delete</button>
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-2xl font-bold mb-4">Create Sale</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="customer" class="block font-bold mb-2">Customer</label>
+                <select id="customer" name="customer" class="border rounded py-2 px-3 w-full">
+                    <option value="">Select customer</option>
+                    {% for customer in customers %}
+                        <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
+                    {% endfor %}
+                </select>
+                {% if errors.customer %}
+                    <p class="text-red-500 text-sm mt-1">{{ errors.customer }}</p>
+                {% endif %}
             </div>
-        </div>
-        <div class="mb-4">
-            <button type="button" id="addProductRow" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Add Product</button>
-        </div>
-        <div class="mb-4">
-            <label class="block font-bold mb-2">Bill Total</label>
-            <input type="text" id="billTotal" class="border rounded py-2 px-3 w-full" disabled>
-        </div>
-        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Create Sale</button>
-    </form>
+            <div id="productRows">
+                <div class="grid grid-cols-5 gap-4 mb-4 product-row">
+                    <div>
+                        <label class="block font-bold mb-2">Product</label>
+                        <select name="product[]" class="border rounded py-2 px-3 w-full product-select">
+                            <option value="">Select product</option>
+                            {% for product in products %}
+                                <option value="{{ product.id }}" data-price="{{ product.price }}" data-code="{{ product.product_code }}">{{ product.title }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if errors.product %}
+                            <p class="text-red-500 text-sm mt-1">{{ errors.product }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-2">Product Code</label>
+                        <input type="text" name="product_code[]" class="border rounded py-2 px-3 w-full product-code-input">
+                     </div>
+                    <div>
+                        <label class="block font-bold mb-2">Quantity</label>
+                        <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full quantity-input" min="1" value="1">
+                        {% if errors.qty %}
+                            <p class="text-red-500 text-sm mt-1">{{ errors.qty }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-2">Price</label>
+                        <input type="hidden" name="price[]" class="border rounded py-2 px-3 w-full price-input" min="0" step="0.01">
+                        <input type="text" class="border rounded py-2 px-3 w-full price-display" disabled>
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-2">Total</label>
+                        <input type="text" class="border rounded py-2 px-3 w-full total-display" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-4">
+                <button type="button" id="addProductRow" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">Add Product</button>
+            </div>
+            <div class="mb-4">
+                <label class="block font-bold mb-2">Bill Total</label>
+                <input type="text" id="billTotal" class="border rounded py-2 px-3 w-full" disabled>
+            </div>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">Create Sale</button>
+        </form>
+    </div>
 
     <script>
         // Function to add a new product row
         function addProductRow() {
             const productRows = document.getElementById('productRows');
             const newRow = document.createElement('div');
-            newRow.className = 'flex items-center mb-2 product-row';
+            newRow.className = 'grid grid-cols-5 gap-4 mb-4 product-row';
             newRow.innerHTML = `
-                <div class="mr-2">
+                <div>
                     <label class="block font-bold mb-2">Product</label>
                     <select name="product[]" class="border rounded py-2 px-3 w-full product-select">
                         <option value="">Select product</option>
                         {% for product in products %}
-                            <option value="{{ product.id }}" data-price="{{ product.price }}">{{ product.title }}</option>
+                            <option value="{{ product.id }}" data-price="{{ product.price }}" data-code="{{ product.product_code }}">{{ product.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="mr-2">
+                <div>
+                    <label class="block font-bold mb-2">Product Code</label>
+                    <input type="text" name="product_code[]" class="border rounded py-2 px-3 w-full product-code-input">
+                      </div>
+                <div>
                     <label class="block font-bold mb-2">Quantity</label>
                     <input type="number" name="qty[]" class="border rounded py-2 px-3 w-full quantity-input" min="1" value="1">
                 </div>
@@ -91,11 +100,13 @@
                     <label class="block font-bold mb-2">Total</label>
                     <input type="text" class="border rounded py-2 px-3 w-full total-display" disabled>
                 </div>
-                <button type="button" class="ml-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded removeProductRow">Delete</button>
+
+                <button type="button" class="block mb-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded removeProductRow">Delete</button>
             `;
             productRows.appendChild(newRow);
             attachProductChangeEvent(newRow); // Attach change event listener for the new row
             attachQuantityChangeEvent(newRow); // Attach change event listener for the new row
+            attachGetProductButtonEvent(newRow); // Attach event listener for the new "Get Product" button
         }
 
         // Function to remove a product row
@@ -145,6 +156,41 @@
             });
         }
 
+
+        function attachupdateproductoncodeevent(row) {
+            const currentProductCode = row.querySelector('.product-code-input').value;
+            const productSelect = row.querySelector('.product-select');
+            const productOptions = productSelect.options;
+        
+            for (let i = 0; i < productOptions.length; i++) {
+                const dataCode = productOptions[i].getAttribute('data-code');
+                if (dataCode !== null && dataCode.trim() !== '') {
+                    const po = dataCode.toUpperCase();
+                    if (po === currentProductCode.toUpperCase()) {
+                        const selectedOption = productSelect.options[productSelect.selectedIndex];
+                        selectedOption.selected = false;
+                        productOptions[i].selected = true;
+                        updateDisplayedPrice({ target: productSelect }); // Update displayed price and total
+                        break;
+                    }
+                }
+            }
+        }
+        
+        
+        {% comment %} When product code is updated trigger attachupdateproductoncodeevent {% endcomment %}
+        document.addEventListener('change', function (event) {
+            if (event.target.classList.contains('product-code-input')) {
+                attachupdateproductoncodeevent(event.target.closest('.product-row'));
+            }
+        });
+
+        // Function to attach event listener for "Get Product" button
+        function attachGetProductButtonEvent(row) {
+            const getProductButton = row.querySelector('.get-product-button');
+            getProductButton.addEventListener('click', updateProductOnCode);
+        }
+
         // Function to calculate and update the Bill total
         function calculateBillTotal() {
             const totalDisplays = document.querySelectorAll('.total-display');
@@ -175,6 +221,7 @@
         const initialRow = document.querySelector('.product-row');
         attachProductChangeEvent(initialRow);
         attachQuantityChangeEvent(initialRow);
+        attachGetProductButtonEvent(initialRow);
 
         // Calculate initial bill total
         calculateBillTotal();

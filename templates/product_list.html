@@ -9,25 +9,35 @@
         </a>
     </div>
 
+    <form class="mb-4" method="GET">
+        <label for="search" class="font-semibold">Product Code:</label>
+        <input type="text" id="search" name="product_code" class="form-input mt-1 block w-full rounded-md bg-gray-100 border border-gray-300 focus:border-gray-500 focus:bg-white focus:ring-0" placeholder="Enter product code...">
+        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mt-2">Filter</button>
+        <a href="{% url 'main:product_list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded mt-2 ml-2">Clear Filter</a>
+    </form>
     <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-300">
+        <table class="w-full border-collapse">
             <thead>
-                <tr>
-                    <th class="py-2 px-4 border-b">Title</th>
-                    <th class="py-2 px-4 border-b">Detail</th>
-                    <th class="py-2 px-4 border-b">Unit</th>
-                    <th class="py-2 px-4 border-b">Price</th>
-                    <th class="py-2 px-4 border-b">Actions</th>
+                <tr class="border-gray-800">
+                    <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">Title</th>
+                    <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">Detail</th>
+                    <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">Unit</th>
+                    <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">Price</th>
+                    <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">Product Code</th>
+                    <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">Category</th>
+                    <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for product in products %}
                 <tr>
-                    <td class="py-2 px-4 border-b">{{ product.title }}</td>
-                    <td class="py-2 px-4 border-b">{{ product.detail }}</td>
-                    <td class="py-2 px-4 border-b">{{ product.unit.title }}</td>
-                    <td class="py-2 px-4 border-b">{{ product.price }}</td>
-                    <td class="py-2 px-4 border-b">
+                    <td class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">{{ product.title }}</td>
+                    <td class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">{{ product.detail }}</td>
+                    <td class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">{{ product.unit.title }}</td>
+                    <td class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">{{ product.price }}</td>
+                    <td class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">{{ product.product_code }}</td>
+                    <td class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">{{ product.category.title }}</td>
+                    <td class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700">
                         <div class="flex">
                             <a href="{% url 'main:product_detail' product.id %}" class="text-blue-500 hover:underline mr-2">View</a>
                             <a href="{% url 'main:product_update' product.id %}" class="text-yellow-500 hover:underline mr-2">Edit</a>
@@ -37,10 +47,28 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td class="py-2 px-4 border-b text-center" colspan="5">No products found.</td>
+                    <td class="py-2 px-4 border-b text-center" colspan="7">No products found.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+
+    {% if products.has_other_pages %}
+    <div class="mt-4 flex justify-between items-center">
+        <div>
+            <span class="text-sm font-semibold text-gray-600">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+        </div>
+        <div>
+            {% if products.has_previous %}
+            <a href="?page=1" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded">First</a>
+            <a href="?page={{ products.previous_page_number }}" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded">Previous</a>
+            {% endif %}
+            {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded">Next</a>
+            <a href="?page={{ products.paginator.num_pages }}" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded">Last</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
 
-from .models import User, Vendor, Unit, Product, Purchase, Customer, Sale, Inventory, SaleItem
+from .models import User, Vendor, Unit, Product, Purchase, Customer, Sale, Inventory, SaleItem, Expense, ProductCategory
 
 
 class UserAdmin(BaseUserAdmin):
@@ -74,3 +74,14 @@ admin.site.register(Customer, CustomerAdmin)
 admin.site.register(Sale, SaleAdmin)
 admin.site.register(Inventory, InventoryAdmin)
 admin.site.register(SaleItem, SaleItemAdmin)
+
+class ExpenseAdmin(admin.ModelAdmin):
+    list_display = ('vendor', 'title', 'detail', 'amount', 'date')
+    list_filter = ('date', 'vendor')
+
+admin.site.register(Expense, ExpenseAdmin)
+
+class ProductCategoryAdmin(admin.ModelAdmin):
+    list_display = ['title']
+
+admin.site.register(ProductCategory, ProductCategoryAdmin)

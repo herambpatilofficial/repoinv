@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mx-auto my-8">
+    <h1 class="text-3xl font-semibold mb-6">Expenses List</h1>
+    
+    <form class="mb-4">
+      <div class="flex space-x-4">
+        <div>
+          <label class="block text-gray-700 font-medium">From Date</label>
+          <input type="date" name="date_from" value="{{ request.GET.date_from }}" class="border border-gray-300 rounded py-2 px-3 w-36">
+        </div>
+        <div>
+          <label class="block text-gray-700 font-medium">To Date</label>
+          <input type="date" name="date_to" value="{{ request.GET.date_to }}" class="border border-gray-300 rounded py-2 px-3 w-36">
+        </div>
+        <div class="flex items-end">
+          <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded">Filter</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr>
+            <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700 text-left">Title</th>
+            <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700 text-left">Detail</th>
+            <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700 text-left">Amount</th>
+            {% if request.user.is_superuser %}
+            <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700 text-left">Vendor</th>
+            {% endif %}
+            <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700 text-left">Date</th>
+            <th class="border border-gray-600 bg-gray-100 px-4 py-2 font-medium text-gray-700 text-left">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for expense in expenses %}
+            <tr>
+              <td class="border border-gray-600 px-4 py-2">{{ expense.title }}</td>
+              <td class="border border-gray-600 px-4 py-2">{{ expense.detail }}</td>
+              <td class="border border-gray-600 px-4 py-2">Rs. {{ expense.amount }}</td>
+              {% if request.user.is_superuser %}
+              <td class="border border-gray-600 px-4 py-2">{{ expense.vendor }}</td>
+              {% endif %}
+              
+              <td class="border border-gray-600 px-4 py-2">{{ expense.date }}</td>
+              <td class="border border-gray-600 px-4 py-2">
+                <a href="{% url 'main:expense_detail' expense.id %}" class="bg-blue-600 text-white py-1 px-3 rounded hover:bg-blue-700">View</a>
+                {% if request.user.is_superuser %}
+                  <a href="{% url 'main:expense_update' expense.id %}" class="bg-green-600 text-white py-1 px-3 rounded hover:bg-green-700 mx-2">
+                    Edit
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                  </a>
+                  <a href="{% url 'main:expense_delete' expense.id %}" class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700">
+                    Delete
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

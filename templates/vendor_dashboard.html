@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<h1 class="text-3xl font-extrabold">{{ request.user.vendor_profile.full_name }}'s Dashboard</h1>
+
+<div class="container mx-auto py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        <!-- Total Sales -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Sales</h2>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-xl text-bold">This Month:</p>
+                    <p class="text-blue-600 text-5xl font-bold my-5" id="this-month-sales">₹ {{ total_sales_amount | intcomma}}</p>
+                    <p class="text-gray-600 text-xl m-1" id="overall-sales">Overall: ₹ {{ overall_sales_amount | intcomma}}</p>
+                
+                </div>
+               
+            </div>
+        </div>
+
+       
+
+        <!-- Total Customers -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Customers</h2>
+            <div>
+                <p class="text-purple-600 text-6xl font-bold">{{ customers|length }}</p>
+            </div>
+        </div>
+
+        <!-- Total Expenses -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Expenses</h2>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-xl ">This Month:</p>
+                    <p class="text-green-600 text-5xl font-bold my-5" id="this-month-expenses">₹ {{ this_month_expenses | intcomma}}</p>
+                    <p class="text-gray-600 text-xl" id="overall-expenses">Overall : ₹ {{ overall_expenses| intcomma}}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Purchases -->
+        <div class="bg-white rounded-lg shadow p-4">
+            <h2 class="text-lg font-bold mb-4">Total Purchases</h2>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-gray-600 text-xl ">This Month:</p>
+                    <p class="text-red-600 text-5xl font-bold my-5" id="this-month-purchases">₹ {{ total_purchases_amount | intcomma}}</p>
+                    <p class="text-gray-600 text-xl" id="overall-purchases">Overall : ₹ {{ overall_purchases_amount | intcomma}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+ {% endblock content %}

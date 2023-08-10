@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto my-8">
+  <h1 class="text-3xl font-semibold mb-6">Update Expense</h1>
+  <form method="post" class="mb-4">
+    {% csrf_token %}
+
+    <div class="mb-4">
+      <label class="block text-gray-700 font-medium">Title</label>
+      <input type="text" name="title" value="{{ expense.title }}" class="border border-gray-300 rounded py-2 px-3 w-full">
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-gray-700 font-medium">Detail</label>
+      <textarea name="detail" class="border border-gray-300 rounded py-2 px-3 w-full" rows="4">{{ expense.detail }}</textarea>
+    </div>
+
+    <div class="mb-4">
+      <label class="block text-gray-700 font-medium">Amount</label>
+      <input type="text" name="amount" value="{{ expense.amount }}" class="border border-gray-300 rounded py-2 px-3 w-full">
+    </div>
+
+   
+
+    <div class="flex space-x-4">
+      <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded">Update Expense</button>
+      <a href="{% url 'main:expense_detail' expense.id %}" class="text-red-600 hover:underline">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
