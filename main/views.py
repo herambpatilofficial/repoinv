@@ -969,7 +969,7 @@ def master_dashboard(request):
 @login_required
 def vendor_dashboard(request):
     products = Inventory.objects.filter(vendor=request.user.vendor_profile)
-    customers = Customer.objects.filter(vendor=request.user)
+    customers = Customer.objects.filter(vendor=request.user.vendor_profile)
     form = ExpenseForm(request.POST)
    
     overall_purchases_amount = 0
@@ -1007,15 +1007,43 @@ def vendor_dashboard(request):
 @staff_member_required
 def vendor_dashboard_superuser(request, vendor_id):
     vendor = get_object_or_404(Vendor, id=vendor_id)
-    purchases = Purchase.objects.filter(vendor=vendor)
-    sales = Sale.objects.filter(vendor=vendor)
-    sale_items = SaleItem.objects.filter(vendor=vendor)
-    inventories = Inventory.objects.filter(vendor=vendor)
-    expenses = Expense.objects.filter(vendor=vendor)
-    customers = Customer.objects.filter(vendor=vendor)
+    products = Inventory.objects.filter(vendor=get_object_or_404(Vendor, id=vendor_id))
+    customers = Customer.objects.filter(vendor=get_object_or_404(Vendor, id=vendor_id).id)
+    print(customers)
+    form = ExpenseForm(request.POST)
+   
+    overall_purchases_amount = 0
+    for purchase in Purchase.objects.filter(vendor=get_object_or_404(Vendor, id=vendor_id).id):
+        overall_purchases_amount += purchase.total_amt
+    
+    overall_sales_amount = 0
+    for sale in Sale.objects.filter(vendor=get_object_or_404(Vendor, id=vendor_id).id):
+        overall_sales_amount += sale.total_sale_amount
+    
+    overall_expenses = 0
+    for expense in Expense.objects.filter(vendor=get_object_or_404(Vendor, id=vendor_id).id):
+        overall_expenses += expense.amount
+
     
 
-    return render(request, 'vendor_dashboard_superuser.html', {'vendor': vendor})
+    
+    # calculate total purchases amount for this month
+    total_purchases_amount = 0
+    for purchase in Purchase.objects.filter(vendor=get_object_or_404(Vendor, id=vendor_id), pur_date__month=datetime.datetime.now().month):
+        total_purchases_amount += purchase.total_amt
+
+    total_sales_amount = 0
+    for sale in Sale.objects.filter(vendor=get_object_or_404(Vendor, id=vendor_id), sale_date__month=datetime.datetime.now().month):
+        total_sales_amount += sale.total_sale_amount
+
+    this_month_expenses = 0
+    for expense in Expense.objects.filter(vendor=get_object_or_404(Vendor, id=vendor_id), date__month=datetime.datetime.now().month):
+        this_month_expenses += expense.amount     
+
+
+    
+
+    return render(request, 'vendor_dashboard_superuser.html', {'vendor':vendor,'products': products, 'customers': customers, 'overall_purchases_amount': overall_purchases_amount, 'overall_sales_amount': overall_sales_amount, 'overall_expenses': overall_expenses, 'total_purchases_amount': total_purchases_amount, 'total_sales_amount': total_sales_amount, 'this_month_expenses': this_month_expenses, 'form': form})
 # import quote_plus
 import csv
 from urllib.parse import quote_plus
