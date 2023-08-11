@@ -969,7 +969,7 @@ def master_dashboard(request):
 @login_required
 def vendor_dashboard(request):
     products = Inventory.objects.filter(vendor=request.user.vendor_profile)
-    customers = Customer.objects.filter(vendor=request.user.vendor_profile)
+    customers = Customer.objects.filter(vendor=request.user)
     form = ExpenseForm(request.POST)
    
     overall_purchases_amount = 0
