@@ -558,7 +558,7 @@ def bill_generate_pdf(request, sale_id):
     content.append(separator_line)
 
     # Title
-    title = Paragraph("TRYAMBAKAM RUDRAKSH", title_style)
+    title = Paragraph("Inventory Management System", title_style)
     content.append(title)
 
     # Phone number
