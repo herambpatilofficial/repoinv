@@ -25,6 +25,9 @@ This project is an inventory management system for franchisee stores built using
 8. **Reporting and Analysis**: Customized reports can be generated to analyze inventory levels, sales performance, and other relevant metrics, assisting in data-driven decision-making.
 9. **Notifications**: Users receive notifications for important inventory updates, low stock items, and pending purchase orders, ensuring timely actions to maintain sufficient stock levels.
 
+![image](https://github.com/user-attachments/assets/ccf08e15-a21b-43dd-af2e-8e9965be6205)
+
+
 ## Installation and Usage
 
 1. Clone the repository.
