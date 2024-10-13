@@ -54,3 +54,7 @@ Refer to issues and kindly contribute:
 This project is licensed under the [MIT License](LICENSE).
 
 Feel free to customize and modify the project according to your needs.
+
+Creds:
+admin : hp   => qwerty
+vendor : vendor3 => qwerty@1234
